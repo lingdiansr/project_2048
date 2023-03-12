@@ -36,3 +36,6 @@ int main()
     ran(6, 20);
     return 0;
 }
+
+
+
