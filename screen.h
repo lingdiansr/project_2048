@@ -3,7 +3,7 @@
 /*
 初始化字符窗口
 */
-void open_screen();
+WINDOW *open_screen();
 void print_screen();
 void close_screen();
 
