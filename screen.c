@@ -10,5 +10,5 @@ void open_screen()
 
 void close_screen();
 {
-    endwin();
+    endwin();   //关闭窗口
 }
