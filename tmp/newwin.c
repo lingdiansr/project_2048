@@ -1,17 +1,17 @@
-#include<stdio.h>
-#include<curses.h>
+#include <curses.h>
 
 int main()
 {
     initscr();
     cbreak();
     noecho();
-    keypad(stdscr,TRUE);
-
-    newwin(4, 4, 0, 0);
+    keypad(stdscr, TRUE);
+    WINDOW *win = newwin(4,4, 0 ,0);
+    waddstr(win, "hello world");
+    wrefresh(win);
+    mvwin(win, 10, 10);
+    wrefresh(win);
     while (1)
-    {
-        /* code */
-    }
+        ;
     return 0;
 }

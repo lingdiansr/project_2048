@@ -7,7 +7,7 @@ void open_screen()
     cbreak();             // crtl+c
     noecho();             // 不用回显
     keypad(stdscr, TRUE); // 使用功能键
-    newwin(4, 4, 5, 5);
+    WINDOW *win = newwin(16, 32, 5, 5);
     while (1)
         ;
 }

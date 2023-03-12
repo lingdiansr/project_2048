@@ -18,4 +18,6 @@ void random_num() // 随机生成2和4
 int main()
 {
     random_num();
+    open_screen();
+    print_screen();
 }
