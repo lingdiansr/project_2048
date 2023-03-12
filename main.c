@@ -5,14 +5,15 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
-
-
-
-
-int main()
+void random_num()
 {
+    srand((unsigned)time(NULL));
     for (int i = 0; i < 10; i++)
     {
-        printf("%d\n", (rand()%2+1)*2);
+        printf("%d\n", (rand() % 2 + 1) * 2);
     }
+}
+int main()
+{
+    
 }
