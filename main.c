@@ -5,10 +5,11 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
-void random_num()   //随机生成2和4
+
+void random_num() // 随机生成2和4
 {
-    time_t t;
-    srand((unsigned)time(&t));  //随机种子
+    time_t t;                  // 获取系统时间作为种子参数
+    srand((unsigned)time(&t)); // 随机种子
     for (int i = 0; i < 10; i++)
     {
         printf("%d\n", (rand() % 2 + 1) * 2);
@@ -16,5 +17,4 @@ void random_num()   //随机生成2和4
 }
 int main()
 {
-    
 }
