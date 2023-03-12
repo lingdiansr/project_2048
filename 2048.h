@@ -1,2 +1,4 @@
+#ifndef _2048_H_
+#define _2048_H_
 
-int box[4][4] = {0};
+#endif

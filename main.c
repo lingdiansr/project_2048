@@ -6,13 +6,13 @@
 #include <time.h>
 #include <stdlib.h>
 
-int box[4][4] = {0};
-srand((unsigned)time(NULL));
+
+
 
 int main()
 {
     for (int i = 0; i < 10; i++)
     {
-        printf("%d\n", (rand()%2)*2);
+        printf("%d\n", (rand()%2+1)*2);
     }
 }
