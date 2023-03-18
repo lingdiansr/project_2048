@@ -93,3 +93,7 @@ void down_combine() // 向下合并
         }
     }
 }
+void game()
+{
+
+}

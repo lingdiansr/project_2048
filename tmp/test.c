@@ -67,7 +67,7 @@ void print_scr(WINDOW *win) // 输出到屏幕上
 int random_num() // 随机生成2或4
 {
     srand(time(NULL));
-    return (rand() % 2 + 1) * 2;
+    return (rand() % (rand()%10) + 1) * 2;
 }
 void fill_rand_num() // 填入随机2/4
 {
