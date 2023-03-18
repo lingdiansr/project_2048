@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-// #include <curses.h>
+#include <curses.h>
+#include <unistd.h>
 #define ROW 4
 #define COL 4
 int a[ROW][COL] = {
@@ -50,16 +51,18 @@ int get_empty() // 获取空位置数量并把位置记录在sqe中
     }
     return n;
 }
-void print_scr() // 输出到屏幕上
+void print_scr(WINDOW *win) // 输出到屏幕上
 {
-    for (int i = 0; i < 4; i++)
+    char buf[6];
+    for (int i = 0; i < ROW; i++)
     {
-        for (int j = 0; j < 4; j++)
+        for (int j = 0; j < COL; j++)
         {
-            printf("%d\t", a[i][j]);
+            sprintf(buf, "%4d", a[i][j]);
+            waddstr(win, buf);
         }
-        printf("\n");
     }
+    wrefresh(win);
 }
 int random_num() // 随机生成2或4
 {
@@ -104,19 +107,19 @@ void down_combine() // 向下合并
         }
     }
 }
-void init_win()
-{
-}
 int main()
 {
-    // WINDOW *win_game;
-
-    print_scr();
-    putchar(10);
+    WINDOW *win_game;
+    win_game = newwin(4, 24, 5, 5);
+    print_scr(win_game);
+    // putchar(10);
+    sleep(2);
     down_combine();
-    print_scr();
-    putchar(10);
+    print_scr(win_game);
+    // putchar(10);
+    sleep(2);
     fill_rand_num();
-    print_scr();
+    // print_scr(win_game);
+    sleep(2);
     return 0;
 }
