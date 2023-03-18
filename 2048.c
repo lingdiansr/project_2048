@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <time.h>
-#define ROW 4
-#define COL 4
+const int ROW = 4;
+const int COL = 4;
 int box[ROW][COL] = {0};
 struct empty_pos
 {
