@@ -1,17 +1,23 @@
-#include <curses.h>
-
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
 int main()
 {
-    initscr();
-    cbreak();
-    noecho();
-    keypad(stdscr, TRUE);
-    WINDOW *win = newwin(4,4, 0 ,0);
-    waddstr(win, "hello world");
-    wrefresh(win);
-    mvwin(win, 10, 10);
-    wrefresh(win);
-    while (1)
-        ;
-    return 0;
+    int a[4][4] = {0};
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            srand((unsigned int)time(NULL) + rand());
+            a[i][j] = rand() % 9 ? 2 : 4;
+        }
+    }
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            printf("%d\t", a[i][j]);
+        }
+        putchar(10);
+    }
 }

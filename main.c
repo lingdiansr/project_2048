@@ -18,8 +18,6 @@ void random_num() // 随机生成2和4
 int main()
 {
     random_num();
-    open_screen();
-    WINDOW *win = newwin(16, 32, 5, 5);
-
+    WINDOW *win = open_screen();
     print_screen();
 }
