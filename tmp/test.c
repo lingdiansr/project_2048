@@ -1,125 +1,76 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <curses.h>
-#include <unistd.h>
 #define ROW 4
 #define COL 4
-int a[ROW][COL] = {
-    0, 2, 0, 0,
-    0, 0, 0, 2,
-    0, 0, 0, 0,
-    0, 4, 0, 2};
-struct empty_pos
+int box[ROW][COL] = {
+    4, 2, 0, 0,
+    8, 4, 2, 0,
+    4, 16, 4, 0,
+    512, 32, 16, 4};
+void up_combine()
 {
-    int x;
-    int y;
-} empty_sqe[ROW * COL]; // 记录空位置坐标
-void empty_init()       // 位置初始化
+}
+void left_combine()
 {
-    for (int i = 0; i < ROW * COL; i++)
+}
+void right_combine()
+{
+}
+void down_combine() // 向下合并
+{
+    int i, j, k;
+    for (i = 0; i < COL; i++)
     {
-        empty_sqe[i].x = 0;
-        empty_sqe[i].y = 0;
+        for (j = ROW - 2; j >= 0; j--)
+        {
+            for (k = j + 1; k <= ROW - 1; k++)
+            {
+                // 寻找合并位置
+                // 1.下方经过或不经过空位有相同数字，合并到该位置
+                // 2.下方有不同数字时，合并到上一个位置
+                // 3.下方全为空，移动到该位置
+                // if中为1. 2. 这两种情况需要提前跳出循环得到位置
+                if (box[k][i] == box[j][i] || (box[k][i] != 0 && box[k][i] != box[j][i]))
+                {
+                    break;
+                }
+            }
+            if (box[k][i] == box[j][i]) // 相同合并
+            {
+                box[k][i] *= 2;
+                box[j][i] = 0;
+            }
+            else if (box[k][i] != 0 && box[k][i] != box[j][i]) // 不同移动到上一个位置
+            {
+                if (k > j + 1)
+                { // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
+                    box[k - 1][i] = box[j][i];
+                    box[j][i] = 0;
+                }
+            }
+            else // 移动到空位置
+            {
+                box[k][i] = box[j][i];
+                box[j][i] = 0;
+            }
+        }
     }
 }
-void bor() // 随机化
+void print_box() // 输出到屏幕上
 {
     for (int i = 0; i < 4; i++)
     {
         for (int j = 0; j < 4; j++)
         {
-            srand((unsigned int)time(NULL) + rand());
-            a[i][j] = rand() % 9 ? 2 : 4;
+            printf("%d\t", box[i][j]);
         }
-    }
-}
-int get_empty() // 获取空位置数量并把位置记录在sqe中
-{
-    int n = 0;
-    for (int i = 0; i < ROW; i++)
-    {
-        for (int j = 0; j < COL; j++)
-        {
-            if (a[i][j] == 0)
-            {
-                n++;
-                empty_sqe[n - 1].x = i;
-                empty_sqe[n - 1].y = j;
-            }
-        }
-    }
-    return n;
-}
-void print_scr(WINDOW *win) // 输出到屏幕上
-{
-    char buf[6];
-    for (int i = 0; i < ROW; i++)
-    {
-        for (int j = 0; j < COL; j++)
-        {
-            sprintf(buf, "%4d", a[i][j]);
-            waddstr(win, buf);
-        }
-    }
-    wrefresh(win);
-}
-int random_num() // 随机生成2或4
-{
-    srand(time(NULL));
-    return (rand() % (rand()%10) + 1) * 2;
-}
-void fill_rand_num() // 填入随机2/4
-{
-    srand(time(NULL));
-    int n = get_empty();
-    int pos = rand() % n;
-    for (int i = 0; i < n; i++)
-    {
-        if (i + 1 == pos)
-        {
-            a[empty_sqe[i].x][empty_sqe[i].y] = random_num();
-        }
-    }
-}
-void down_combine() // 向下合并
-{
-    for (int i = ROW - 1; i > 0; i--)
-    {
-        for (int j = 0; j < COL; j++)
-        {
-            if (a[i][j] == a[i - 1][j]) // 如果上面的与下面的相同，合并，上面置零
-            {
-                a[i][j] *= 2;
-                a[i - 1][j] = 0;
-            }
-            else if (a[i][j] == 0 && a[i - 1][j] != 0) // 如果下面为空，那么上面的下移
-            {
-                for (int k = i; k < 4; k++)
-                {
-                    if (a[k][j] != 0)
-                    {
-                        a[k - 1][j] = a[i - 1][j];
-                        a[i - 1][j] = 0;
-                    }
-                }
-            }
-        }
+        printf("\n");
     }
 }
 int main()
 {
-    WINDOW *win_game;
-    win_game = newwin(4, 24, 5, 5);
-    print_scr(win_game);
-    // putchar(10);
-    sleep(2);
+    print_box();
+    printf("\n");
     down_combine();
-    print_scr(win_game);
-    // putchar(10);
-    sleep(2);
-    fill_rand_num();
-    // print_scr(win_game);
-    sleep(2);
+    print_box();
     return 0;
 }
