@@ -1,6 +1,6 @@
 #ifndef _2048_H_
 #define _2048_H_
-
+#define DIFFICUITY 0
 int get_empty();      // 位置初始化
 void print_box();     // 输出到屏幕上
 int random_num();     // 随机生成2或4

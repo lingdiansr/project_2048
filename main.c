@@ -7,5 +7,5 @@
 
 int main()
 {
-
+    open_screen();
 }
