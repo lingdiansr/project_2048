@@ -272,7 +272,7 @@ bool judge_end()
             m_backup[i][j] = matrix[i][j];
         }
     }
-    if (up_combine() || down_combine() || left_combine() || right_combine ||)
+    if (up_combine() || down_combine() || left_combine() || right_combine )
     {
         return false;
     }
