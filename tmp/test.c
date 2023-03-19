@@ -3,10 +3,10 @@
 #define ROW 4
 #define COL 4
 int box[ROW][COL] = {
-    4, 2, 0, 0,
-    8, 4, 2, 0,
-    4, 16, 4, 0,
-    512, 32, 16, 4};
+    2, 2, 2, 4,
+    4, 8, 16, 0,
+    2, 0, 2, 0,
+    256, 0, 0, 2};
 bool up_combine() // 向上合并
 {
     int i, j, k;
@@ -52,6 +52,11 @@ bool up_combine() // 向上合并
     }
     return flag;
 }
+//  4  4  2  2 
+//  8 4 2 8
+
+
+
 bool down_combine() // 向下合并
 {
     int i, j, k;
@@ -101,10 +106,83 @@ bool left_combine()
 {
     int i, j, k;
     bool flag = false;
-    
+    for (i = 0; i < ROW; i++)
+    {
+        for (j = 1; j <= COL - 1; j++)
+        {
+            for (k = j - 1; k > 0; k--)
+            {
+                if (box[i][k] == box[i][j] || (box[i][k] != 0 && box[i][k] != box[i][j]))
+                {
+                    break;
+                }
+            }
+            if (box[i][k] == box[i][j]) // 相同合并
+            {
+                box[i][k] *= 2;
+                box[i][j] = 0;
+                flag = true;
+            }
+            else if (box[i][k] != 0 && box[i][k] != box[i][j]) // 不同移动到上一个位置
+            {
+                if (k < j - 1)                 //*
+                {                              // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
+                    box[i][k + 1] = box[i][j]; //*
+                    box[i][j] = 0;
+                    flag = true;
+                }
+            }
+            else // 移动到空位置
+            {
+                box[i][k] = box[i][j];
+                box[i][j] = 0;
+                flag = true;
+            }
+        }
+    }
+    return flag;
 }
 bool right_combine()
 {
+    int i, j, k;
+    bool flag = false;
+    for (i = 0; i < ROW; i++)
+    {
+        for (j = COL-2; j >=0; j--)
+        {
+            for (k = j + 1; k <COL-1; k++)
+            {
+                if (box[i][k] == box[i][j] || (box[i][k] != 0 && box[i][k] != box[i][j]))
+                {
+                    break;
+                }
+            }
+            if (box[i][k] == box[i][j]) // 相同合并
+            {
+                box[i][k] *= 2;
+                box[i][j] = 0;
+                flag = true;
+            }
+            else if (box[i][k] != 0 && box[i][k] != box[i][j]) // 不同移动到上一个位置
+            {
+                if (k > j + 1)                 //*
+                {                              // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
+                    box[i][k - 1] = box[i][j]; //*
+                    box[i][j] = 0;
+                    flag = true;
+                }
+            }
+            else // 移动到空位置
+            {
+                box[i][k] = box[i][j];
+                box[i][j] = 0;
+                flag = true;
+            }
+
+        }
+        
+    }
+    return flag;
 }
 void print_box() // 输出到屏幕上
 {
@@ -122,7 +200,7 @@ int main()
 {
     print_box();
     printf("\n");
-    up_combine();
+    right_combine();
     print_box();
     return 0;
 }
