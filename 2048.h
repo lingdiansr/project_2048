@@ -9,6 +9,5 @@ void up_combine();    // 向下合并
 void left_combine();  // 向左合并
 void right_combine(); // 向右合并
 void down_combine();  // 向下合并
-void game();
-
+void game_2048();
 #endif

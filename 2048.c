@@ -6,6 +6,7 @@
 #define ROW SIZE
 #define COL SIZE
 WINDOW *win_game;
+unsigned long long socre = 0;
 int matrix[ROW][COL] = {
     0, 0, 0, 0,
     0, 0, 0, 0,
@@ -257,18 +258,27 @@ bool right_combine()
     }
     return flag;
 }
-bool judge_end()
+void get_score(int num)
 {
-    bool full;
-    bool com;
+    
+}
+bool judge_end()
+{ // false表示游戏还能继续，true表示游戏结束
+    int m_backup[ROW][COL] = {0};
     for (int i = 0; i < ROW; i++)
     {
         for (int j = 0; j < COL; j++)
         {
-            if (i == 0 && j > 0)
-            {
-            }
+            m_backup[i][j] = matrix[i][j];
         }
+    }
+    if (up_combine() || down_combine() || left_combine() || right_combine ||)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
     }
 }
 void game_2048()
@@ -305,6 +315,10 @@ void game_2048()
         if (flag)
         {
             fill_rand_num();
+        }
+        if (judge_end())
+        {
+            break;
         }
     }
 }
