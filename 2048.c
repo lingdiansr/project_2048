@@ -10,6 +10,11 @@ struct empty_pos
     int x;
     int y;
 } empty_sqe[ROW * COL]; // 记录空位置坐标
+
+void init_game_win(int width,int hight)
+{
+    win_game = newwin(width, hight, 0, 0);
+}
 void empty_init()       // 位置初始化
 {
     for (int i = 0; i < ROW * COL; i++)
@@ -250,5 +255,5 @@ bool right_combine()
 void game_2048()
 {
     srand(time(NULL));
-    
+    init_game_win(, 4, 26);
 }
