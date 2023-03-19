@@ -111,6 +111,7 @@ bool up_combine() // 向上合并
             if (matrix[k][i] == matrix[j][i]) // 相同合并
             {
                 matrix[k][i] *= 2;
+                get_score(matrix[j][i]);
                 matrix[j][i] = 0;
                 flag = true;
             }
@@ -119,6 +120,7 @@ bool up_combine() // 向上合并
                 if (k < j - 1)                       //*
                 {                                    // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
                     matrix[k + 1][i] = matrix[j][i]; //*
+                    get_score(matrix[j][i]);
                     matrix[j][i] = 0;
                     flag = true;
                 }
@@ -260,7 +262,7 @@ bool right_combine()
 }
 void get_score(int num)
 {
-    
+    socre += num;
 }
 bool judge_end()
 { // false表示游戏还能继续，true表示游戏结束
@@ -286,9 +288,10 @@ void game_2048()
     srand(time(NULL));
     // init_game_win(, 4, 26);
     init_game_win(40, 40);
+    socre = 0;
     fill_rand_num();
     fill_rand_num();
-    print_matrix();
+    
 
     while (1)
     {
