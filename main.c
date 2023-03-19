@@ -7,8 +7,8 @@
 
 int main()
 {
-    begin_screen();
-
+    //begin_screen();
+    open_screen();
     game_2048();
     close_screen();
 }

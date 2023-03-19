@@ -2,9 +2,12 @@
 #include <time.h>
 #include <curses.h>
 #include "input.h"
+#include "screen.h"
+
 #define SIZE 4
 #define ROW SIZE
 #define COL SIZE
+
 WINDOW *win_game;
 unsigned long long socre = 0;
 int matrix[ROW][COL] = {
@@ -21,6 +24,10 @@ struct empty_pos
 void init_game_win(int width, int hight)
 {
     win_game = newwin(width, hight, 0, 0);
+}
+void get_score(int num)
+{
+    socre += num;
 }
 void empty_init() // 位置初始化
 {
@@ -61,14 +68,18 @@ int get_empty() // 获取空位置数量并把位置记录在sqe中
 }
 void print_matrix() // 输出到屏幕上
 {
+    // draw_grid();
     for (int i = 0; i < 4; i++)
     {
         for (int j = 0; j < 4; j++)
         {
-            printf("%d\t", matrix[i][j]);
+            wmove(win_game,i, 6 * j);
+            char buf[6];
+            sprintf(buf, "%4d", matrix[i][j]);
+            waddstr(win_game, buf);
         }
-        printf("\n");
     }
+    wrefresh(win_game);
 }
 int random_num() // 随机生成2或4
 {
@@ -260,10 +271,6 @@ bool right_combine()
     }
     return flag;
 }
-void get_score(int num)
-{
-    socre += num;
-}
 bool judge_end()
 { // false表示游戏还能继续，true表示游戏结束
     int m_backup[ROW][COL] = {0};
@@ -274,7 +281,7 @@ bool judge_end()
             m_backup[i][j] = matrix[i][j];
         }
     }
-    if (up_combine() || down_combine() || left_combine() || right_combine )
+    if (up_combine() || down_combine() || left_combine() || right_combine)
     {
         return false;
     }
@@ -287,15 +294,15 @@ void game_2048()
 {
     srand(time(NULL));
     // init_game_win(, 4, 26);
-    init_game_win(40, 40);
+    init_game_win(4, 24);
     socre = 0;
     fill_rand_num();
     fill_rand_num();
-    
-
+    print_matrix();
     while (1)
     {
         bool flag = false;
+        
         switch (get_user_input())
         {
         case LEFT:
@@ -317,11 +324,15 @@ void game_2048()
         }
         if (flag)
         {
+
             fill_rand_num();
+            print_matrix();
         }
         if (judge_end())
         {
+            
             break;
         }
+        //wrefresh(win_game);
     }
 }

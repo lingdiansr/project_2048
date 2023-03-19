@@ -58,10 +58,10 @@ void open_screen()
     cbreak();             // ctrl+c结束游戏进程
     noecho();             // 不用回显
     keypad(stdscr, TRUE); // 使用功能键：上下左右
-    newwin(4, 4, 100, 100);
-    draw_grid();
-    curs_set(0);
-    while (1)
+    //newwin(4, 4, 100, 100);
+    //draw_grid();
+    //curs_set(0);
+    //while (1)
         ;
 }
 
