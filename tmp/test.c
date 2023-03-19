@@ -52,12 +52,6 @@ bool up_combine() // 向上合并
     }
     return flag;
 }
-//  4  4  2  2 
-
-//  8 4 2 8
-
-
-
 bool down_combine() // 向下合并
 {
     int i, j, k;
