@@ -4,7 +4,8 @@
 初始化字符窗口
 */
 void open_screen();
-//void print_screen();
+void begin_screen();
+// void print_screen();
 void close_screen();
 
 #endif

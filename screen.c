@@ -29,14 +29,27 @@ void draw_grid(void)
 }
 void begin_screen() // 创建一个主界面窗口
 {
+    int x0 = 4, y0 = 4;
     initscr();
     noecho();
-    WINDOW *win_begin = newwin(10, 10, 0, 0);
-    mvwaddch(win_begin, 2, 2, "WELCOME 2048");
+
+    WINDOW *win_begin = newwin(100, 100, y0, x0);
+    // draw_grid();
+    curs_set(0);
+    wmove(win_begin, 0, 5);
+    waddstr(win_begin, "   WELCOME TO 2048");
+    wmove(win_begin, 4, 4);
+    waddstr(win_begin, " 1.Normal mode: enter p");
+    wmove(win_begin, 8, 4);
+    waddstr(win_begin, " 2.Cheat mode: enter c");
+    wmove(win_begin, 12, 4);
+    waddstr(win_begin, "3.Control centre: enter i");
+
     wrefresh(win_begin);
     keypad(stdscr, TRUE);
     while (1)
         ;
+    
 }
 
 void open_screen()
