@@ -6,5 +6,5 @@
 #define UP 3 
 #define DOWN 4
 #define QUIT -1
-
+int get_user_input();
 #endif
