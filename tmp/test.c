@@ -53,6 +53,7 @@ bool up_combine() // 向上合并
     return flag;
 }
 //  4  4  2  2 
+
 //  8 4 2 8
 
 
