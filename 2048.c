@@ -19,7 +19,7 @@ struct empty_pos
 {
     int x;
     int y;
-} empty_sqe[ROW * COL]; // 记录空位置坐标
+} empty_sqe[16]; // 记录空位置坐标
 
 void init_game_win(int width, int hight)
 {
@@ -91,16 +91,17 @@ void print_matrix() // 输出到屏幕上
 int random_num() // 随机生成2或4
 {
     srand((unsigned int)time(NULL) + rand());
-    return rand() % (rand() % 10) ? 2 : 4;
+    return rand() % 9? 2 : 4;
 }
 void fill_rand_num() // 填入随机2/4
 {
     srand(time(NULL));
     int n = get_empty();
     int pos = rand() % n;
+    
     for (int i = 0; i < n; i++)
     {
-        if (i + 1 == pos)
+        if (n==1||i + 1 == pos)
         {
             matrix[empty_sqe[i].x][empty_sqe[i].y] = random_num();
         }
