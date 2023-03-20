@@ -4,7 +4,7 @@ extern WINDOW *win_game;
 int get_user_input()
 {
     keypad(win_game, TRUE);
-    char ch = wgetch(win_game);
+    int ch = wgetch(win_game);
     keypad(win_game, FALSE);
     if (ch == 'q' || ch == 'Q')
     {

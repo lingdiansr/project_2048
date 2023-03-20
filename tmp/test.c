@@ -1,12 +1,124 @@
+#include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #include <stdbool.h>
-#define ROW 4
-#define COL 4
-int box[ROW][COL] = {
-    2, 2, 2, 4,
-    4, 8, 16, 0,
-    2, 0, 2, 0,
-    256, 0, 0, 2};
+
+#define SIZE 4
+#define ROW SIZE
+#define COL SIZE
+#define LEFT 1
+#define RIGHT 2
+#define UP 3
+#define DOWN 4
+#define QUIT -1
+
+unsigned long long socre = 0;
+int matrix[ROW][COL] = {
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0};
+struct empty_pos
+{
+    int x;
+    int y;
+} empty_sqe[ROW * COL]; // 记录空位置坐标
+int get_user_input()
+{
+    int ch;
+    ch=getchar();
+    if (ch == 'q' || ch == 'Q')
+    {
+        return QUIT;
+    }
+    else if (ch == 'a' || ch == 'A' )
+    {
+        return LEFT;
+    }
+    else if (ch == 'w' || ch == 'W' )
+    {
+        return UP;
+    }
+    else if (ch == 's' || ch == 'S' )
+    {
+        return DOWN;
+    }
+    else if (ch == 'd' || ch == 'D' )
+    {
+        return RIGHT;
+    }
+}
+void get_score(int num)
+{
+    socre += num;
+}
+void empty_init() // 位置初始化
+{
+    for (int i = 0; i < ROW * COL; i++)
+    {
+        empty_sqe[i].x = 0;
+        empty_sqe[i].y = 0;
+    }
+}
+void bor() // 随机化matrix
+{
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            srand((unsigned int)time(NULL) + rand());
+            matrix[i][j] = rand() % 9 ? 2 : 4;
+        }
+    }
+}
+int get_empty() // 获取空位置数量并把位置记录在sqe中
+{
+    empty_init();
+    int n = 0;
+    for (int i = 0; i < ROW; i++)
+    {
+        for (int j = 0; j < COL; j++)
+        {
+            if (matrix[i][j] == 0)
+            {
+                empty_sqe[n].x = i;
+                empty_sqe[n].y = j;
+                n++;
+            }
+        }
+    }
+    return n;
+}
+void print_matrix() // 输出到屏幕上
+{
+    // draw_grid();
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            printf("%4d", matrix[i][j]);
+        }
+        putchar(10);
+    }
+}
+int random_num() // 随机生成2或4
+{
+    srand((unsigned int)time(NULL) + rand());
+    return rand() % (rand() % 10) ? 2 : 4;
+}
+void fill_rand_num() // 填入随机2/4
+{
+    srand(time(NULL));
+    int n = get_empty();
+    int pos = rand() % n;
+    for (int i = 0; i < n; i++)
+    {
+        if (i + 1 == pos)
+        {
+            matrix[empty_sqe[i].x][empty_sqe[i].y] = random_num();
+        }
+    }
+}
 bool up_combine() // 向上合并
 {
     int i, j, k;
@@ -22,30 +134,32 @@ bool up_combine() // 向上合并
                 // 2.上方有不同数字时，合并到上一个位置
                 // 3.上方全为空，移动到该位置
                 // if中为1. 2. 这两种情况需要提前跳出循环得到位置
-                if (box[k][i] == box[j][i] || (box[k][i] != 0 && box[k][i] != box[j][i]))
+                if (matrix[k][i] == matrix[j][i] || (matrix[k][i] != 0 && matrix[k][i] != matrix[j][i]))
                 {
                     break;
                 }
             }
-            if (box[k][i] == box[j][i]) // 相同合并
+            if (matrix[k][i] == matrix[j][i]) // 相同合并
             {
-                box[k][i] *= 2;
-                box[j][i] = 0;
+                matrix[k][i] *= 2;
+                get_score(matrix[j][i]);
+                matrix[j][i] = 0;
                 flag = true;
             }
-            else if (box[k][i] != 0 && box[k][i] != box[j][i]) // 不同移动到上一个位置
+            else if (matrix[k][i] != 0 && matrix[k][i] != matrix[j][i]) // 不同移动到上一个位置
             {
-                if (k < j - 1)                 //*
-                {                              // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
-                    box[k + 1][i] = box[j][i]; //*
-                    box[j][i] = 0;
+                if (k < j - 1)                       //*
+                {                                    // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
+                    matrix[k + 1][i] = matrix[j][i]; //*
+                    get_score(matrix[j][i]);
+                    matrix[j][i] = 0;
                     flag = true;
                 }
             }
             else // 移动到空位置
             {
-                box[k][i] = box[j][i];
-                box[j][i] = 0;
+                matrix[k][i] = matrix[j][i];
+                matrix[j][i] = 0;
                 flag = true;
             }
         }
@@ -67,30 +181,30 @@ bool down_combine() // 向下合并
                 // 2.下方有不同数字时，合并到上一个位置
                 // 3.下方全为空，移动到该位置
                 // if中为1. 2. 这两种情况需要提前跳出循环得到位置
-                if (box[k][i] == box[j][i] || (box[k][i] != 0 && box[k][i] != box[j][i]))
+                if (matrix[k][i] == matrix[j][i] || (matrix[k][i] != 0 && matrix[k][i] != matrix[j][i]))
                 {
                     break;
                 }
             }
-            if (box[k][i] == box[j][i]) // 相同合并
+            if (matrix[k][i] == matrix[j][i]) // 相同合并
             {
-                box[k][i] *= 2;
-                box[j][i] = 0;
+                matrix[k][i] *= 2;
+                matrix[j][i] = 0;
                 flag = true;
             }
-            else if (box[k][i] != 0 && box[k][i] != box[j][i]) // 不同移动到上一个位置
+            else if (matrix[k][i] != 0 && matrix[k][i] != matrix[j][i]) // 不同移动到上一个位置
             {
                 if (k > j + 1)
                 { // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
-                    box[k - 1][i] = box[j][i];
-                    box[j][i] = 0;
+                    matrix[k - 1][i] = matrix[j][i];
+                    matrix[j][i] = 0;
                     flag = true;
                 }
             }
             else // 移动到空位置
             {
-                box[k][i] = box[j][i];
-                box[j][i] = 0;
+                matrix[k][i] = matrix[j][i];
+                matrix[j][i] = 0;
                 flag = true;
             }
         }
@@ -107,32 +221,33 @@ bool left_combine()
         {
             for (k = j - 1; k > 0; k--)
             {
-                if (box[i][k] == box[i][j] || (box[i][k] != 0 && box[i][k] != box[i][j]))
+                if (matrix[i][k] == matrix[i][j] || (matrix[i][k] != 0 && matrix[i][k] != matrix[i][j]))
                 {
                     break;
                 }
             }
-            if (box[i][k] == box[i][j]) // 相同合并
+            if (matrix[i][k] == matrix[i][j]) // 相同合并
             {
-                box[i][k] *= 2;
-                box[i][j] = 0;
+                matrix[i][k] *= 2;
+                matrix[i][j] = 0;
                 flag = true;
             }
-            else if (box[i][k] != 0 && box[i][k] != box[i][j]) // 不同移动到上一个位置
+            else if (matrix[i][k] != 0 && matrix[i][k] != matrix[i][j]) // 不同移动到上一个位置
             {
-                if (k < j - 1)                 //*
-                {                              // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
-                    box[i][k + 1] = box[i][j]; //*
-                    box[i][j] = 0;
+                if (k < j - 1)                       //*
+                {                                    // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
+                    matrix[i][k + 1] = matrix[i][j]; //*
+                    matrix[i][j] = 0;
                     flag = true;
                 }
             }
             else // 移动到空位置
             {
-                box[i][k] = box[i][j];
-                box[i][j] = 0;
+                matrix[i][k] = matrix[i][j];
+                matrix[i][j] = 0;
                 flag = true;
             }
+            print_matrix();
         }
     }
     return flag;
@@ -143,59 +258,100 @@ bool right_combine()
     bool flag = false;
     for (i = 0; i < ROW; i++)
     {
-        for (j = COL-2; j >=0; j--)
+        for (j = COL - 2; j >= 0; j--)
         {
-            for (k = j + 1; k <COL-1; k++)
+            for (k = j + 1; k < COL - 1; k++)
             {
-                if (box[i][k] == box[i][j] || (box[i][k] != 0 && box[i][k] != box[i][j]))
+                if (matrix[i][k] == matrix[i][j] || (matrix[i][k] != 0 && matrix[i][k] != matrix[i][j]))
                 {
                     break;
                 }
             }
-            if (box[i][k] == box[i][j]) // 相同合并
+            if (matrix[i][k] == matrix[i][j]) // 相同合并
             {
-                box[i][k] *= 2;
-                box[i][j] = 0;
+                matrix[i][k] *= 2;
+                matrix[i][j] = 0;
                 flag = true;
             }
-            else if (box[i][k] != 0 && box[i][k] != box[i][j]) // 不同移动到上一个位置
+            else if (matrix[i][k] != 0 && matrix[i][k] != matrix[i][j]) // 不同移动到上一个位置
             {
-                if (k > j + 1)                 //*
-                {                              // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
-                    box[i][k - 1] = box[i][j]; //*
-                    box[i][j] = 0;
+                if (k > j + 1)                       //*
+                {                                    // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
+                    matrix[i][k - 1] = matrix[i][j]; //*
+                    matrix[i][j] = 0;
                     flag = true;
                 }
             }
             else // 移动到空位置
             {
-                box[i][k] = box[i][j];
-                box[i][j] = 0;
+                matrix[i][k] = matrix[i][j];
+                matrix[i][j] = 0;
                 flag = true;
             }
-
         }
-        
     }
     return flag;
 }
-void print_box() // 输出到屏幕上
-{
-    for (int i = 0; i < 4; i++)
+bool judge_end()
+{ // false表示游戏还能继续，true表示游戏结束
+    int m_backup[ROW][COL] = {0};
+    for (int i = 0; i < ROW; i++)
     {
-        for (int j = 0; j < 4; j++)
+        for (int j = 0; j < COL; j++)
         {
-            printf("%d\t", box[i][j]);
+            m_backup[i][j] = matrix[i][j];
         }
-        printf("\n");
     }
-    printf("\n");
+    if (up_combine() || down_combine() || left_combine() || right_combine())
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
 }
-int main()
+void game_2048()
 {
-    print_box();
-    printf("\n");
-    right_combine();
-    print_box();
-    return 0;
+    srand(time(NULL));
+    // init_game_win(, 4, 26);
+    //init_game_win(4, 24);
+    socre = 0;
+    fill_rand_num();
+    fill_rand_num();
+    print_matrix();
+    while (1)
+    {
+        //curs_set(0);
+        bool flag = false;
+        switch (get_user_input())
+        {
+        case LEFT:
+            flag = left_combine();
+            break;
+        case RIGHT:
+            flag = right_combine();
+            break;
+        case UP:
+            flag = up_combine();
+            break;
+        case DOWN:
+            flag = down_combine();
+            break;
+        case QUIT:
+            return;
+        default:
+            break;
+        }
+        if (flag)
+        {
+            fill_rand_num();
+            print_matrix();
+        }
+        if (judge_end())
+        {
+            break;
+        }
+        // wrefresh(win_game);
+    }
 }
