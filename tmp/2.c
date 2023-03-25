@@ -1,16 +1,27 @@
 #include <stdio.h>
-int main()
+
+#define OPTION_A 0
+#define OPTION_B 1
+#define size 5
+int main(void)
 {
-    int x, y, z;
-    for (x = 1; x < 20; x++)
+    int option = 0;
+
+    printf("Enter an option (0 for Option A, 1 for Option B): ");
+    scanf("%d", &option);
+
+
+    if (option == OPTION_A)
     {
-        for (y = 1; y < 30; y++)
-        {
-            z = 100 - x - y;
-            if (z > 1 && (100-5*x-3*y)*3+x+y==100)
-            {
-                printf("%d %d %d \n", x, y,z);
-            }
-        }
+        printf("%d\n", size);
+#ifdef size 
+#undef size
+#define size 3
+#endif
+        printf("%d\n", size);
     }
+
+
+
+    return 0;
 }

@@ -1,7 +1,8 @@
 #include <curses.h>
 #include <stdio.h>
-#define ROW 4
-#define COL 4
+#define SIZE 4
+#define ROW SIZE
+#define COL SIZE
 int a[ROW][COL] = {
     0, 2, 0, 0,
     0, 0, 0, 2,
@@ -13,16 +14,21 @@ int main()
     cbreak();             // crtl+c
     noecho();             // 不用回显
     keypad(stdscr, TRUE); // 使用功能键
-    char b[8];
+    
     WINDOW *t_win = newwin(4, 26, 5, 5);
-    for (int i = 0; i < ROW; i++)
+    int ch = wgetch(t_win);
+    waddch(t_win, (char)SIZE);
+    if (ch=='8')
     {
-        for (int j = 0; j < COL; j++)
-        {
-            wmove(t_win, i, 6 * j);
-            sprintf(b, "%5d", a[i][j]);
-            waddstr(t_win, b);
-        }
+        #ifdef SIZE
+        #undef SIZE
+        #define SIZE 8
+        #endif 
     }
-    wrefresh(t_win);
+    waddch(t_win, (char)SIZE);
+    while (1)
+    {
+        /* code */
+    }
+    
 }

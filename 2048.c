@@ -4,12 +4,13 @@
 #include "input.h"
 #include "screen.h"
 
-#define SIZE 4
 #define ROW SIZE
 #define COL SIZE
 
 WINDOW *win_game;
+
 unsigned long long socre = 0;
+
 int matrix[ROW][COL] = {
     0, 0, 0, 0,
     0, 0, 0, 0,
@@ -20,12 +21,11 @@ struct empty_pos
     int x;
     int y;
 } empty_sqe[16]; // 记录空位置坐标
-
 void init_game_win(int width, int hight)
 {
     win_game = newwin(width, hight, 0, 0);
 }
-void get_score(int num)
+void get_score(int num) // 记录得分
 {
     socre += num;
 }
@@ -68,40 +68,51 @@ int get_empty() // 获取空位置数量并把位置记录在sqe中
 }
 void print_matrix() // 输出到屏幕上
 {
-    // draw_grid();
-    for (int i = 0; i < 4; i++)
+    int i, j;
+    for (i = 0; i < ROW; i++)
     {
-        for (int j = 0; j < 4; j++)
+        for (j = 0; j < COL; j++)
         {
-            wmove(win_game, i, 6 * j);
-            char buf[6];
+            move(i * 2, j * 5);
+            printw("+-----+");
+            move(i * 2 + 1, j * 5);
             if (matrix[i][j] == 0)
             {
-                waddstr(win_game, "    ");
+                printw("|     |");
             }
             else
             {
-                sprintf(buf, "%4d", matrix[i][j]);
-                waddstr(win_game, buf);
+                printw("|%4d |", matrix[i][j]);
             }
         }
+        move(i * 2, COL * 5);
+        printw("+\n");
+        move(i * 2 + 1, COL * 5);
+        printw("|\n");
     }
-    wrefresh(win_game);
+    for (j = 0; j < COL; j++)
+    {
+        move(ROW * 2, j * 5);
+        printw("+-----+");
+    }
+    move(ROW * 2, ROW * 5);
+    printw("+\n");
+    refresh();
 }
 int random_num() // 随机生成2或4
 {
     srand((unsigned int)time(NULL) + rand());
-    return rand() % 9? 2 : 4;
+    return rand() % 9 ? 2 : 4;
 }
 void fill_rand_num() // 填入随机2/4
 {
     srand(time(NULL));
     int n = get_empty();
     int pos = rand() % n;
-    
+
     for (int i = 0; i < n; i++)
     {
-        if (n==1||i + 1 == pos)
+        if (n == 1 || i + 1 == pos)
         {
             matrix[empty_sqe[i].x][empty_sqe[i].y] = random_num();
         }
@@ -301,16 +312,17 @@ bool judge_end()
 }
 void game_2048()
 {
+    curs_set(0);
     srand(time(NULL));
-    // init_game_win(, 4, 26);
-    init_game_win(4, 24);
+    init_game_win(24, 24);
     socre = 0;
     fill_rand_num();
     fill_rand_num();
     print_matrix();
+
     while (1)
     {
-        curs_set(0);
+
         bool flag = false;
         switch (get_user_input())
         {

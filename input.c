@@ -1,6 +1,59 @@
 #include "input.h"
+#include "screen.h"
+
 #include <curses.h>
+
+
 extern WINDOW *win_game;
+extern WINDOW *win_begin;
+void set_size()
+{
+    keypad(win_begin, true);
+    int ch = wgetch(win_begin);
+    keypad(win_begin, false);
+    switch (begain_input())
+    {
+    case QUIT:
+        close_screen();
+        break;
+    case NOR_MODE:
+#ifdef SIZE
+#undef SIZE
+#define SIZE 8
+#endif
+        break;
+    case LIT_MODE:
+#ifdef SIZE
+#undef SIZE
+#define SIZE 6
+#endif
+        break;
+    default:
+        break;
+    }
+}
+int begain_input()
+{
+    keypad(win_begin, true);
+    int ch = wgetch(win_begin);
+    keypad(win_begin, false);
+    if (ch == 'q' || ch == 'Q')
+    {
+        return QUIT;
+    }
+    else if (ch == 'e' || ch == 'E')
+    {
+        return EAS_MODE;
+    }
+    else if (ch == 'l' || ch == 'L')
+    {
+        return LIT_MODE;
+    }
+    else if (ch == 'n' || ch == 'N')
+    {
+        return NOR_MODE;
+    }
+}
 int get_user_input()
 {
     keypad(win_game, TRUE);

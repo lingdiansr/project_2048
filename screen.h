@@ -1,5 +1,6 @@
 #ifndef _SCREEN_H_
 #define _SCREEN_H_
+
 /*
 初始化字符窗口
 */
