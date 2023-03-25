@@ -56,8 +56,8 @@ void free_matrix() // 释放内存
 }
 void init_game_win(int width, int hight) //创建游戏主窗口
 {
-    win_game = newwin(width, hight, 4, 4);
-    win_score = newwin(10, 4, 0, 0);
+    win_game = newwin(width, hight, 8, 8);
+    win_score = newwin(7, 10, 0, 0);
 }
 void get_score(int num) // 记录得分并输出
 {
@@ -70,36 +70,16 @@ void write_score(unsigned long long socre)//将得分记录写进本地文件
     time_t now;
     time(&now);
     fp = fopen("score.txt", "w"); // 打开文件，如果不存在则创建一个新文件
-
-
     fprintf(fp, "时间：%s 分数：%llu",ctime(&now), socre); // 将分数写入文件
     fclose(fp);               // 关闭文件
-
-
-
 }
-void empty_init() // 位置初始化
+int get_empty() // 获取空位置数量并把位置记录在sqe中
 {
-    for (int i = 0; i < ROW * COL; i++)
+    for (int i = 0; i < ROW * COL; i++) // 位置初始化
     {
         empty_sqe[i].x = 0;
         empty_sqe[i].y = 0;
     }
-}
-void bor() // 随机化matrix
-{
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            srand((unsigned int)time(NULL) + rand());
-            matrix[i][j] = rand() % 9 ? 2 : 4;
-        }
-    }
-}
-int get_empty() // 获取空位置数量并把位置记录在sqe中
-{
-    empty_init();
     int n = 0;
     for (int i = 0; i < ROW; i++)
     {
@@ -190,7 +170,6 @@ bool up_combine(int **block) // 向上合并
             if (block[k][i] == block[j][i]) // 相同合并
             {
                 block[k][i] *= 2;
-                get_score(block[j][i]);
                 block[j][i] = 0;
                 flag = true;
             }
@@ -199,7 +178,6 @@ bool up_combine(int **block) // 向上合并
                 if (k < j - 1)                     //*
                 {                                  // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
                     block[k + 1][i] = block[j][i]; //*
-                    get_score(block[j][i]);
                     block[j][i] = 0;
                     flag = true;
                 }

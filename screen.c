@@ -25,7 +25,7 @@ void close_screen()
 }
 void begin_screen() // 创建一个主界面窗口
 {
-    int x0 = 4, y0 = 4;
+    int x0 = 8, y0 = 8;
     int width = 50;
 
     win_begin = newwin(100, width, y0, x0);
@@ -47,4 +47,5 @@ void begin_screen() // 创建一个主界面窗口
     wrefresh(win_begin);
     set_size();
     delwin(win_begin);
+    refresh();
 }
