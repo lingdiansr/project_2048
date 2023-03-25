@@ -4,7 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "E:/a/mingw64/**"
+                "D:\\mingw64\\x86_64-w64-mingw32/**"
             ],
             "defines": [
                 "_DEBUG",
@@ -14,7 +14,7 @@
             "cStandard": "c17",
             "cppStandard": "gnu++14",
             "intelliSenseMode": "windows-gcc-x64",
-            "compilerPath": "E:/a/mingw64/bin/gcc.exe"
+            "compilerPath": "D:\\mingw64\\x86_64-w64-mingw32"
         }
     ],
     "version": 4

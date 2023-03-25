@@ -21,6 +21,23 @@ void open_screen()
 
 void close_screen()
 {
+    int x0 = 8, y0 = 8;
+    int width = 50;
+    curs_set(0);
+    int restart_x = (width - strlen("1. restart: press the key R twice")) / 2;
+    int native_chart_x = (width - strlen("2. open the score chart: press the key S twice")) / 2;
+    int quit_x=(width-strlen("4.press Q to quit"))/2;
+
+    mvwprintw(win_begin, 4, restart_x, "1. restart: press the key R twice");
+    mvwprintw(win_begin, 8, native_chart_x, "2. open the score chart: press the key S twice");
+    mvwprintw(win_begin, 12, quit_x, "4.press Q to quit");
+
+
+     wrefresh(win_begin);
+    set_size();
+    delwin(win_begin);
+    refresh();
+
     endwin(); // 关闭窗口
 }
 void begin_screen() // 创建一个主界面窗口
