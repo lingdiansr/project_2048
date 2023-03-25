@@ -6,8 +6,8 @@
 */
 void open_screen();
 void begin_screen();
-void draw_grid(void);
-// void print_screen();
+
+
 void close_screen();
 
 #endif

@@ -75,7 +75,7 @@ void write_score(unsigned long long socre)//将得分记录写进本地文件
     fprintf(fp, "时间：%s 分数：%llu",ctime(&now), socre); // 将分数写入文件
     fclose(fp);               // 关闭文件
 
-    return 0;
+
 
 }
 void empty_init() // 位置初始化

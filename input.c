@@ -10,9 +10,6 @@ extern int ROW;
 extern int COL;
 void set_size()
 {
-    keypad(win_begin, true);
-    int ch = wgetch(win_begin);
-    keypad(win_begin, false);
     switch (begain_input())
     {
     case QUIT:
