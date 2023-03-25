@@ -8,12 +8,7 @@
 int main()
 {
     open_screen();
-    //begin_screen();
-        // draw_grid();
-        // while (1)
-        // {
-        //     /* code */
-        // }
+    begin_screen();
     
     game_2048();
     close_screen();

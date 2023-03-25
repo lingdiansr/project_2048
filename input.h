@@ -1,7 +1,7 @@
 #ifndef _INPUT_H_
 #define _INPUT_H_
 
-#define SIZE 4
+
 
 #define LEFT 1
 #define RIGHT 2

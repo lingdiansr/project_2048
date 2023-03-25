@@ -6,6 +6,8 @@
 
 extern WINDOW *win_game;
 extern WINDOW *win_begin;
+extern int ROW;
+extern int COL;
 void set_size()
 {
     keypad(win_begin, true);
@@ -16,19 +18,17 @@ void set_size()
     case QUIT:
         close_screen();
         break;
-    case NOR_MODE:
-#ifdef SIZE
-#undef SIZE
-#define SIZE 8
-#endif
+    case EAS_MODE:
+        ROW = 8;
+        COL = 8;
         break;
     case LIT_MODE:
-#ifdef SIZE
-#undef SIZE
-#define SIZE 6
-#endif
+        ROW = 6;
+        COL = 6;
         break;
     default:
+        ROW = 4;
+        COL = 4;
         break;
     }
 }

@@ -1,4 +1,5 @@
 #include <curses.h>
+#include<string.h>
 #include "input.h"
 #include "2048.h"
 
@@ -25,24 +26,25 @@ void close_screen()
 void begin_screen() // 创建一个主界面窗口
 {
     int x0 = 4, y0 = 4;
+    int width = 50;
 
-    // initscr();
-    // noecho();
-
-    win_begin = newwin(100, 100, y0, x0);
-    // draw_grid();
+    win_begin = newwin(100, width, y0, x0);
     curs_set(0);
-    wmove(win_begin, 0, 5);
-    waddstr(win_begin, "            WELCOME TO 2048         ");
-    wmove(win_begin, 4, 4);
-    waddstr(win_begin, "   1.Easy mode,8*8 size: enter E    ");
-    wmove(win_begin, 8, 4);
-    waddstr(win_begin, "2.Little easy mode,6*6 size: enter L");
-    wmove(win_begin, 12, 4);
-    waddstr(win_begin, "  3.Normal mode,4*4 size: enter N   ");
+
+    // 计算居中位置并输出文字
+    int welcome_x = (width - strlen("WELCOME TO 2048")) / 2;
+    int easy_x = (width - strlen("1.Easy mode,8*8 size: press the key E twice") )/ 2;
+    int little_x = (width - strlen("2.Little easy mode,6*6 size: press the key L twice")) / 2;
+    int normal_x = (width - strlen("3.Normal mode,4*4 size: press the key N twice")) / 2;
+    int quit_x=(width-strlen("4.press Q to quit"))/2;
+
+    mvwprintw(win_begin, 0, welcome_x, "WELCOME TO 2048");
+    mvwprintw(win_begin, 4, easy_x, "1.Easy mode,8*8 size: press the key E twice");
+    mvwprintw(win_begin, 8, little_x, "2.Little easy mode,6*6 size: press the key L twice");
+    mvwprintw(win_begin, 12, normal_x, "3.Normal mode,4*4 size: press the key N twice");
+    mvwprintw(win_begin, 16, quit_x, "4.press Q to quit");
 
     wrefresh(win_begin);
-    
     set_size();
-    
+    delwin(win_begin);
 }

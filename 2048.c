@@ -4,26 +4,52 @@
 #include "input.h"
 #include "screen.h"
 
-#define ROW SIZE
-#define COL SIZE
+int ROW;
+int COL;
 
 WINDOW *win_game;
+int **matrix;
+struct empty_pos *empty_sqe;
 
 unsigned long long socre = 0;
-
-int matrix[ROW][COL] = {
-    0, 0, 0, 0,
-    0, 0, 0, 0,
-    0, 0, 0, 0,
-    0, 0, 0, 0};
 struct empty_pos
 {
     int x;
     int y;
-} empty_sqe[16]; // 记录空位置坐标
+};
+void init_matrix()
+{
+    // 申请行内存
+    matrix = (int **)malloc(ROW * sizeof(int *));
+
+    // 申请列内存
+    for (int i = 0; i < ROW; i++)
+    {
+        matrix[i] = (int *)malloc(COL * sizeof(int));
+    }
+
+    // 初始化
+    for (int i = 0; i < ROW; i++)
+    {
+        for (int j = 0; j < COL; j++)
+        {
+            matrix[i][j] = 0;
+        }
+    }
+    empty_sqe = (struct empty_pos *)malloc(sizeof(struct empty_pos) * ROW * COL);
+}
+void free_matrix()
+{
+    // 释放内存
+    for (int i = 0; i < ROW; i++)
+    {
+        free(matrix[i]);
+    }
+    free(matrix);
+}
 void init_game_win(int width, int hight)
 {
-    win_game = newwin(width, hight, 0, 0);
+    win_game = newwin(width, hight, 4, 4);
 }
 void get_score(int num) // 记录得分
 {
@@ -66,38 +92,38 @@ int get_empty() // 获取空位置数量并把位置记录在sqe中
     }
     return n;
 }
-void print_matrix() // 输出到屏幕上
+void print_matrix() // 输出到指定窗口上
 {
     int i, j;
     for (i = 0; i < ROW; i++)
     {
         for (j = 0; j < COL; j++)
         {
-            move(i * 2, j * 5);
-            printw("+-----+");
-            move(i * 2 + 1, j * 5);
+            wmove(win_game, i * 2, j * 5);
+            wprintw(win_game, "+-----+");
+            wmove(win_game, i * 2 + 1, j * 5);
             if (matrix[i][j] == 0)
             {
-                printw("|     |");
+                wprintw(win_game, "|     |");
             }
             else
             {
-                printw("|%4d |", matrix[i][j]);
+                wprintw(win_game, "|%4d |", matrix[i][j]);
             }
         }
-        move(i * 2, COL * 5);
-        printw("+\n");
-        move(i * 2 + 1, COL * 5);
-        printw("|\n");
+        wmove(win_game, i * 2, COL * 5);
+        wprintw(win_game, "+\n");
+        wmove(win_game, i * 2 + 1, COL * 5);
+        wprintw(win_game, "|\n");
     }
     for (j = 0; j < COL; j++)
     {
-        move(ROW * 2, j * 5);
-        printw("+-----+");
+        wmove(win_game, ROW * 2, j * 5);
+        wprintw(win_game, "+-----+");
     }
-    move(ROW * 2, ROW * 5);
-    printw("+\n");
-    refresh();
+    wmove(win_game, ROW * 2, ROW * 5);
+    wprintw(win_game, "+\n");
+    wrefresh(win_game);
 }
 int random_num() // 随机生成2或4
 {
@@ -118,7 +144,7 @@ void fill_rand_num() // 填入随机2/4
         }
     }
 }
-bool up_combine(int block[ROW][COL]) // 向上合并
+bool up_combine(int **block) // 向上合并
 {
     int i, j, k;
     bool flag = false;
@@ -165,7 +191,7 @@ bool up_combine(int block[ROW][COL]) // 向上合并
     }
     return flag;
 }
-bool down_combine(int block[ROW][COL]) // 向下合并
+bool down_combine(int **block) // 向下合并
 {
     int i, j, k;
     bool flag = false;
@@ -210,7 +236,7 @@ bool down_combine(int block[ROW][COL]) // 向下合并
     }
     return flag;
 }
-bool left_combine(int block[ROW][COL])
+bool left_combine(int **block)
 {
     int i, j, k;
     bool flag = false;
@@ -251,7 +277,7 @@ bool left_combine(int block[ROW][COL])
     }
     return flag;
 }
-bool right_combine(int block[ROW][COL])
+bool right_combine(int **block)
 {
     int i, j, k;
     bool flag = false;
@@ -293,7 +319,18 @@ bool right_combine(int block[ROW][COL])
 }
 bool judge_end()
 { // false表示游戏还能继续，true表示游戏结束
-    int m_backup[ROW][COL] = {0};
+    // int m_backup[ROW][COL] = {0};
+    int **m_backup;
+
+    // 申请行内存
+    m_backup = (int **)malloc(ROW * sizeof(int *));
+
+    // 申请列内存
+    for (int i = 0; i < ROW; i++)
+    {
+        m_backup[i] = (int *)malloc(COL * sizeof(int));
+    }
+
     for (int i = 0; i < ROW; i++)
     {
         for (int j = 0; j < COL; j++)
@@ -301,6 +338,7 @@ bool judge_end()
             m_backup[i][j] = matrix[i][j];
         }
     }
+
     if (up_combine(m_backup) || down_combine(m_backup) || left_combine(m_backup) || right_combine(m_backup))
     {
         return false;
@@ -312,9 +350,10 @@ bool judge_end()
 }
 void game_2048()
 {
+    init_matrix();
     curs_set(0);
     srand(time(NULL));
-    init_game_win(24, 24);
+    init_game_win(100, 100);
     socre = 0;
     fill_rand_num();
     fill_rand_num();
@@ -350,8 +389,8 @@ void game_2048()
         }
         if (judge_end())
         {
+            free_matrix();
             break;
         }
-        // wrefresh(win_game);
     }
 }
