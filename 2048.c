@@ -44,8 +44,10 @@ void free_matrix()
     for (int i = 0; i < ROW; i++)
     {
         free(matrix[i]);
+
     }
     free(matrix);
+    free(empty_sqe);
 }
 void init_game_win(int width, int hight)
 {
@@ -319,7 +321,7 @@ bool right_combine(int **block)
 }
 bool judge_end()
 { // false表示游戏还能继续，true表示游戏结束
-    // int m_backup[ROW][COL] = {0};
+
     int **m_backup;
 
     // 申请行内存
