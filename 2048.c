@@ -19,9 +19,9 @@ WINDOW *win_score;
 int **matrix;
 struct empty_pos *empty_sqe;
 
-unsigned long long socre = 0;   //用于记录得分
+unsigned long long socre = 0; // 用于记录得分
 
-void init_matrix()  //创建窗格
+void init_matrix() // 创建窗格
 {
     // 申请行内存
     matrix = (int **)malloc(ROW * sizeof(int *));
@@ -47,14 +47,13 @@ void free_matrix() // 释放内存
     for (int i = 0; i < ROW; i++)
     {
         free(matrix[i]);
-
     }
     free(matrix);
     free(empty_sqe);
     delwin(win_game);
     delwin(win_score);
 }
-void init_game_win(int width, int hight) //创建游戏主窗口
+void init_game_win(int width, int hight) // 创建游戏主窗口
 {
     win_game = newwin(width, hight, 8, 8);
     win_score = newwin(7, 10, 0, 0);
@@ -62,16 +61,15 @@ void init_game_win(int width, int hight) //创建游戏主窗口
 void get_score(int num) // 记录得分并输出
 {
     socre += num;
-    
 }
-void write_score(unsigned long long socre)//将得分记录写进本地文件
+void write_score(unsigned long long socre) // 将得分记录写进本地文件
 {
     FILE *fp;
     time_t now;
     time(&now);
-    fp = fopen("score.txt", "w"); // 打开文件，如果不存在则创建一个新文件
-    fprintf(fp, "时间：%s 分数：%llu",ctime(&now), socre); // 将分数写入文件
-    fclose(fp);               // 关闭文件
+    fp = fopen("score.txt", "w");                           // 打开文件，如果不存在则创建一个新文件
+    fprintf(fp, "时间：%s 分数：%llu", ctime(&now), socre); // 将分数写入文件
+    fclose(fp);                                             // 关闭文件
 }
 int get_empty() // 获取空位置数量并把位置记录在sqe中
 {
@@ -273,7 +271,6 @@ bool left_combine(int **block)
                 block[i][j] = 0;
                 flag = true;
             }
-            
         }
     }
     return flag;
@@ -288,30 +285,30 @@ bool right_combine(int **block)
         {
             for (k = j + 1; k < COL - 1; k++)
             {
-                if ( block[i][k] ==  block[i][j] || ( block[i][k] != 0 &&  block[i][k] !=  block[i][j]))
+                if (block[i][k] == block[i][j] || (block[i][k] != 0 && block[i][k] != block[i][j]))
                 {
                     break;
                 }
             }
-            if ( block[i][k] ==  block[i][j]) // 相同合并
+            if (block[i][k] == block[i][j]) // 相同合并
             {
-                 block[i][k] *= 2;
-                 block[i][j] = 0;
+                block[i][k] *= 2;
+                block[i][j] = 0;
                 flag = true;
             }
-            else if ( block[i][k] != 0 &&  block[i][k] !=  block[i][j]) // 不同移动到上一个位置
+            else if (block[i][k] != 0 && block[i][k] != block[i][j]) // 不同移动到上一个位置
             {
-                if (k > j + 1)                       //*
-                {                                    // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
-                     block[i][k - 1] =  block[i][j]; //*
-                     block[i][j] = 0;
+                if (k > j + 1)                     //*
+                {                                  // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
+                    block[i][k - 1] = block[i][j]; //*
+                    block[i][j] = 0;
                     flag = true;
                 }
             }
             else // 移动到空位置
             {
-                 block[i][k] =  block[i][j];
-                 block[i][j] = 0;
+                block[i][k] = block[i][j];
+                block[i][j] = 0;
                 flag = true;
             }
         }

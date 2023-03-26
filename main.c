@@ -9,7 +9,7 @@ int main()
 {
     open_screen();
     begin_screen();
-    
+
     game_2048();
     close_screen();
 }

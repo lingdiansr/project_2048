@@ -3,7 +3,6 @@
 
 #include <curses.h>
 
-
 extern WINDOW *win_game;
 extern WINDOW *win_begin;
 extern int ROW;
