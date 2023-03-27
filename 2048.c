@@ -30,16 +30,29 @@ struct empty_pos *empty_sqe;
 
 unsigned long long score = 0; // 用于记录得分
 
+// 函数名称：get_score_history
+// 函数功能：从文件中读取历史得分记录并存储到数组中
+// 参数：无
+// 返回值：无
 void get_score_history()
 {
+    // 定义文件名
+    // 文件名为字符串类型的字符数组，可以在函数内部直接修改
     char filename[] = "history.txt";
+
+    // 定义文件指针
     FILE *fp;
+
+    // 定义字符串变量
     char line[40];
 
-    fp = fopen(filename, "r"); // 打开文件
+    // 打开文件
+    fp = fopen(filename, "r");
+
+    // 判断文件是否成功打开
     if (fp == NULL)
     {
-        // 文件没有成功打开时，新建一个文件
+        // 如果文件没有成功打开，则新建一个文件
         fp = fopen(filename, "w+");
         fclose(fp);
         return;
@@ -47,39 +60,48 @@ void get_score_history()
 
     // 逐行读取文件内容
     int line_count = 0;
-    while (fgets(line, 40, fp) != NULL && line_count < 10) // 修改条件，只读取前10行
+    while (fgets(line, 40, fp) != NULL && line_count < 10) // 只读取前10行
     {
-        strtok(line, "\n"); // 去掉换行符
+        // 去掉换行符
+        strtok(line, "\n");
 
         // 将读取到的内容按照格式存储到score_history数组中
         sscanf(line, "%d. score:%llu time:%s", &score_history[line_count].rand, &score_history[line_count].score, score_history[line_count].time);
 
-        line_count++; // 更新行数计数器
+        // 更新行数计数器
+        line_count++;
     }
-    fclose(fp); // 关闭文件
+
+    // 关闭文件
+    fclose(fp);
 }
-void write_score(unsigned long long s) // 将得分记录写进本地文件
+
+// 函数名：write_score
+// 参数：无符号长整型 s，表示得分
+// 返回值：无
+// 功能：将得分记录写进本地文件
+void write_score(unsigned long long s)
 {
-    FILE *fp;
-    time_t now;
-    time(&now);
-    score_mark temp;
-    score_history[10].score = s;
-    score_history[10].rand = 11;
-    char *time_str = strtok(ctime(&now), "\n");
-    for (int i = 0; i < strlen(time_str); i++)
+    FILE *fp;                                   // 文件指针
+    time_t now;                                 // 时间变量
+    time(&now);                                 // 获取当前时间
+    score_mark temp;                            // 分数记录结构体
+    score_history[10].score = s;                // 将得分存储到分数记录数组中
+    score_history[10].rand = 11;                // 将随机数存储到分数记录数组中
+    char *time_str = strtok(ctime(&now), "\n"); // 获取时间字符串
+    for (int i = 0; i < strlen(time_str); i++)  // 将时间字符串中的空格替换为“-”
     {
         if (time_str[i] == ' ')
         {
             time_str[i] = '-';
         }
     }
-    strcpy(score_history[10].time, time_str);
-    for (int i = 0; i < 11; i++)
+    strcpy(score_history[10].time, time_str); // 将时间字符串存储到分数记录数组中
+    for (int i = 0; i < 11; i++)              // 冒泡排序分数记录数组，按照分数从高到低排序
     {
         for (int j = 0; j < 10 - i; j++)
         {
-            if (score_history[j].score < score_history[j + 1].score) // 修改比较条件
+            if (score_history[j].score < score_history[j + 1].score) // 如果前一个分数比后一个分数小，则交换两个分数记录
             {
                 temp = score_history[j];
                 score_history[j] = score_history[j + 1];
@@ -90,14 +112,12 @@ void write_score(unsigned long long s) // 将得分记录写进本地文件
 
     fp = fopen("history.txt", "w+"); // 打开文件，如果不存在则创建一个新文件
 
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 10; i++) // 将排名前十的分数记录写入文件中
     {
-        printf("%d. score:%llu time:%s\n", i + 1, score_history[i].score, strtok(score_history[i].time, "\n"));
         fprintf(fp, "%d. score:%llu time:%-s\n", i + 1, score_history[i].score, strtok(score_history[i].time, "\n"));
     }
-    fclose(fp);
+    fclose(fp); // 关闭文件
 }
-
 void init_matrix() // 创建窗格
 {
     // 申请行内存
@@ -136,7 +156,6 @@ void init_game_win(int width, int hight) // 创建游戏主窗口
     win_game = newwin(width, hight, 8, 8);
     win_score = newwin(7, 10, 0, 0);
 }
-
 int get_empty() // 获取空位置数量并把位置记录在sqe中
 {
     for (int i = 0; i < ROW * COL; i++) // 位置初始化
@@ -225,12 +244,14 @@ bool up_combine(int **block) // 向上合并
             {
                 block[k][i] = block[j][i];
                 block[j][i] = 0;
+                score += block[k][i];
                 flag = true;
             }
             else if (block[k][i] == block[j][i]) // 相同合并
             {
                 block[k][i] *= 2;
                 block[j][i] = 0;
+                score += block[k][i];
                 k++; // 合并后k位置不变
                 flag = true;
             }
@@ -262,12 +283,14 @@ bool down_combine(int **block) // 向下合并
             {
                 block[k][i] = block[j][i];
                 block[j][i] = 0;
+                score += block[k][i];
                 flag = true;
             }
             else if (block[k][i] == block[j][i]) // 相同合并
             {
                 block[k][i] *= 2;
                 block[j][i] = 0;
+                score += block[k][i];
                 k--; // 合并后k位置不变
                 flag = true;
             }
@@ -299,12 +322,14 @@ bool left_combine(int **block)
             {
                 block[i][k] = block[i][j];
                 block[i][j] = 0;
+                score += block[i][k];
                 flag = true;
             }
             else if (block[i][k] == block[i][j]) // 相同合并
             {
                 block[i][k] *= 2;
                 block[i][j] = 0;
+                score += block[i][k];
                 k++; // 合并后k位置不变
                 flag = true;
             }
@@ -322,12 +347,6 @@ bool left_combine(int **block)
     }
     return flag;
 }
-
-// 优化思路：
-
-// 精简循环：将三层循环合并为两层，同时在循环中判断当前位置是否为空，避免不必要的循环。
-// 优化查找合并位置的算法：将查找合并位置的循环改为记录下一个可以移动的位置，大大降低了时间复杂度。
-// 减少重复操作：合并后的位置不需要再次移动，通过记录下一个可以移动的位置来避免重复操作。
 bool right_combine(int **block)
 {
     bool flag = false;
@@ -342,12 +361,14 @@ bool right_combine(int **block)
             {
                 block[i][k] = block[i][j];
                 block[i][j] = 0;
+                score += block[i][k];
                 flag = true;
             }
             else if (block[i][k] == block[i][j]) // 相同合并
             {
                 block[i][k] *= 2;
                 block[i][j] = 0;
+                score += block[i][k];
                 k--; // 合并后k位置不变
                 flag = true;
             }
@@ -367,7 +388,7 @@ bool right_combine(int **block)
 }
 bool judge_end()
 { // false表示游戏还能继续，true表示游戏结束
-
+    bool flag;
     int **m_backup;
 
     // 申请行内存
@@ -389,12 +410,20 @@ bool judge_end()
 
     if (up_combine(m_backup) || down_combine(m_backup) || left_combine(m_backup) || right_combine(m_backup))
     {
-        return false;
+        flag = false;
     }
     else
     {
-        return true;
+        flag = true;
     }
+
+    for (int i = 0; i < ROW; i++)
+    {
+        free(m_backup[i]);
+    }
+    free(m_backup); // 释放m_backup内存占用
+
+    return flag;
 }
 void game_2048()
 {
