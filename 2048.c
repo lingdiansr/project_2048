@@ -29,7 +29,6 @@ int **matrix;
 struct empty_pos *empty_sqe;
 
 unsigned long long score = 0; // 用于记录得分
-char score_history[11][40];
 
 void get_score_history()
 {
@@ -138,15 +137,6 @@ void init_game_win(int width, int hight) // 创建游戏主窗口
     win_score = newwin(7, 10, 0, 0);
 }
 
-void write_score(unsigned long long socre) // 将得分记录写进本地文件
-{
-    FILE *fp;
-    time_t now;
-    time(&now);
-    fp = fopen("score.txt", "w");                           // 打开文件，如果不存在则创建一个新文件
-    fprintf(fp, "时间：%s 分数：%llu", ctime(&now), socre); // 将分数写入文件
-    fclose(fp);                                             // 关闭文件
-}
 int get_empty() // 获取空位置数量并把位置记录在sqe中
 {
     for (int i = 0; i < ROW * COL; i++) // 位置初始化
@@ -223,44 +213,36 @@ void fill_rand_num() // 填入随机2/4
 }
 bool up_combine(int **block) // 向上合并
 {
-    int i, j, k;
     bool flag = false;
-    for (i = 0; i < COL; i++)
+    for (int i = 0; i < COL; i++)
     {
-        for (j = 1; j <= ROW - 1; j++) //*
+        int k = 0; // 记录下一个可以移动的位置
+        for (int j = 1; j < COL; j++)
         {
-            for (k = j - 1; k > 0; k--) //*
-            {
-                // 寻找合并位置
-                // 1.上方经过或不经过空位有相同数字，合并到该位置
-                // 2.上方有不同数字时，合并到上一个位置
-                // 3.上方全为空，移动到该位置
-                // if中为1. 2. 这两种情况需要提前跳出循环得到位置
-                if (block[k][i] == block[j][i] || (block[k][i] != 0 && block[k][i] != block[j][i]))
-                {
-                    break;
-                }
-            }
-            if (block[k][i] == block[j][i]) // 相同合并
-            {
-                block[k][i] *= 2;
-                block[j][i] = 0;
-                flag = true;
-            }
-            else if (block[k][i] != 0 && block[k][i] != block[j][i]) // 不同移动到上一个位置
-            {
-                if (k < j - 1)                     //*
-                {                                  // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
-                    block[k + 1][i] = block[j][i]; //*
-                    block[j][i] = 0;
-                    flag = true;
-                }
-            }
-            else // 移动到空位置
+            if (block[j][i] == 0) // 当前位置为空，跳过
+                continue;
+            if (block[k][i] == 0) // 下一个位置为空，移动到该位置
             {
                 block[k][i] = block[j][i];
                 block[j][i] = 0;
                 flag = true;
+            }
+            else if (block[k][i] == block[j][i]) // 相同合并
+            {
+                block[k][i] *= 2;
+                block[j][i] = 0;
+                k++; // 合并后k位置不变
+                flag = true;
+            }
+            else // 不同移动到上一个位置
+            {
+                k++;
+                if (k != j) // 需要移动
+                {
+                    block[k][i] = block[j][i];
+                    block[j][i] = 0;
+                    flag = true;
+                }
             }
         }
     }
@@ -268,44 +250,36 @@ bool up_combine(int **block) // 向上合并
 }
 bool down_combine(int **block) // 向下合并
 {
-    int i, j, k;
     bool flag = false;
-    for (i = 0; i < COL; i++)
+    for (int i = 0; i < COL; i++)
     {
-        for (j = ROW - 2; j >= 0; j--)
+        int k = ROW - 1; // 记录下一个可以移动的位置
+        for (int j = ROW - 2; j >= 0; j--)
         {
-            for (k = j + 1; k < ROW - 1; k++)
-            {
-                // 寻找合并位置
-                // 1.下方经过或不经过空位有相同数字，合并到该位置
-                // 2.下方有不同数字时，合并到上一个位置
-                // 3.下方全为空，移动到该位置
-                // if中为1. 2. 这两种情况需要提前跳出循环得到位置
-                if (block[k][i] == block[j][i] || (block[k][i] != 0 && block[k][i] != block[j][i]))
-                {
-                    break;
-                }
-            }
-            if (block[k][i] == block[j][i]) // 相同合并
-            {
-                block[k][i] *= 2;
-                block[j][i] = 0;
-                flag = true;
-            }
-            else if (block[k][i] != 0 && block[k][i] != block[j][i]) // 不同移动到上一个位置
-            {
-                if (k > j + 1)
-                { // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
-                    block[k - 1][i] = block[j][i];
-                    block[j][i] = 0;
-                    flag = true;
-                }
-            }
-            else // 移动到空位置
+            if (block[j][i] == 0) // 当前位置为空，跳过
+                continue;
+            if (block[k][i] == 0) // 下一个位置为空，移动到该位置
             {
                 block[k][i] = block[j][i];
                 block[j][i] = 0;
                 flag = true;
+            }
+            else if (block[k][i] == block[j][i]) // 相同合并
+            {
+                block[k][i] *= 2;
+                block[j][i] = 0;
+                k--; // 合并后k位置不变
+                flag = true;
+            }
+            else // 不同移动到上一个位置
+            {
+                k--;
+                if (k != j) // 需要移动
+                {
+                    block[k][i] = block[j][i];
+                    block[j][i] = 0;
+                    flag = true;
+                }
             }
         }
     }
@@ -313,79 +287,79 @@ bool down_combine(int **block) // 向下合并
 }
 bool left_combine(int **block)
 {
-    int i, j, k;
     bool flag = false;
-    for (i = 0; i < ROW; i++)
+    for (int i = 0; i < ROW; i++)
     {
-        for (j = 1; j <= COL - 1; j++)
+        int k = 0; // 记录下一个可以移动的位置
+        for (int j = 1; j < COL; j++)
         {
-            for (k = j - 1; k > 0; k--)
-            {
-                if (block[i][k] == block[i][j] || (block[i][k] != 0 && block[i][k] != block[i][j]))
-                {
-                    break;
-                }
-            }
-            if (block[i][k] == block[i][j]) // 相同合并
-            {
-                block[i][k] *= 2;
-                block[i][j] = 0;
-                flag = true;
-            }
-            else if (block[i][k] != 0 && block[i][k] != block[i][j]) // 不同移动到上一个位置
-            {
-                if (k < j - 1)                     //*
-                {                                  // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
-                    block[i][k + 1] = block[i][j]; //*
-                    block[i][j] = 0;
-                    flag = true;
-                }
-            }
-            else // 移动到空位置
+            if (block[i][j] == 0) // 当前位置为空，跳过
+                continue;
+            if (block[i][k] == 0) // 下一个位置为空，移动到该位置
             {
                 block[i][k] = block[i][j];
                 block[i][j] = 0;
                 flag = true;
+            }
+            else if (block[i][k] == block[i][j]) // 相同合并
+            {
+                block[i][k] *= 2;
+                block[i][j] = 0;
+                k++; // 合并后k位置不变
+                flag = true;
+            }
+            else // 不同移动到上一个位置
+            {
+                k++;
+                if (k != j) // 需要移动
+                {
+                    block[i][k] = block[i][j];
+                    block[i][j] = 0;
+                    flag = true;
+                }
             }
         }
     }
     return flag;
 }
+
+// 优化思路：
+
+// 精简循环：将三层循环合并为两层，同时在循环中判断当前位置是否为空，避免不必要的循环。
+// 优化查找合并位置的算法：将查找合并位置的循环改为记录下一个可以移动的位置，大大降低了时间复杂度。
+// 减少重复操作：合并后的位置不需要再次移动，通过记录下一个可以移动的位置来避免重复操作。
 bool right_combine(int **block)
 {
-    int i, j, k;
     bool flag = false;
-    for (i = 0; i < ROW; i++)
+    for (int i = 0; i < ROW; i++)
     {
-        for (j = COL - 2; j >= 0; j--)
+        int k = COL - 1;
+        for (int j = COL - 2; j >= 0; j--)
         {
-            for (k = j + 1; k < COL - 1; k++)
-            {
-                if (block[i][k] == block[i][j] || (block[i][k] != 0 && block[i][k] != block[i][j]))
-                {
-                    break;
-                }
-            }
-            if (block[i][k] == block[i][j]) // 相同合并
-            {
-                block[i][k] *= 2;
-                block[i][j] = 0;
-                flag = true;
-            }
-            else if (block[i][k] != 0 && block[i][k] != block[i][j]) // 不同移动到上一个位置
-            {
-                if (k > j + 1)                     //*
-                {                                  // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
-                    block[i][k - 1] = block[i][j]; //*
-                    block[i][j] = 0;
-                    flag = true;
-                }
-            }
-            else // 移动到空位置
+            if (block[i][j] == 0) // 当前位置为空，跳过
+                continue;
+            if (block[i][k] == 0) // 下一个位置为空，移动到该位置
             {
                 block[i][k] = block[i][j];
                 block[i][j] = 0;
                 flag = true;
+            }
+            else if (block[i][k] == block[i][j]) // 相同合并
+            {
+                block[i][k] *= 2;
+                block[i][j] = 0;
+                k--; // 合并后k位置不变
+                flag = true;
+            }
+            else // 不同移动到上一个位置
+            {
+                k--;
+                if (k != j) // 需要移动
+                {
+                    block[i][k] = block[i][j];
+                    block[i][j] = 0;
+                    flag = true;
+                }
             }
         }
     }
@@ -429,7 +403,7 @@ void game_2048()
     srand(time(NULL));
     init_game_win(100, 100);
     score = 0;
-    get_score_history();//各种初始化
+    get_score_history(); // 各种初始化
 
     fill_rand_num();
     fill_rand_num();
