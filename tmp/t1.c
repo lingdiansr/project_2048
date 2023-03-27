@@ -1,5 +1,14 @@
 #include <stdio.h>
-char score_history[11][40];
+#include <stdlib.h>
+#include <string.h>
+typedef struct
+{
+    int rand;                 // 存储2位整数
+    unsigned long long score; // 存储8位整数
+    char time[25];
+} score_mark;
+
+score_mark score_history[11];
 
 void get_score_history()
 {
@@ -20,26 +29,40 @@ void get_score_history()
     int line_count = 0;
     while (fgets(line, 40, fp) != NULL)
     {
-        // 去掉换行符
-        strtok(line, "\n");
+        strtok(line, "\n"); // 去掉换行符
 
-        // 存储到字符串数组中
-        strcpy(score_history[line_count], line);
-
-        // 更新行数计数器
-        line_count++;
+        line_count++; // 更新行数计数器
     }
 
     fclose(fp); // 关闭文件
+    for (int i = 0; i < line_count; i++)
+    {
+        printf("%s", score_history[i]);
+    }
 }
-void write_score(unsigned long long socre) // 将得分记录写进本地文件
+void write_score(unsigned long long s) // 将得分记录写进本地文件
 {
     FILE *fp;
     time_t now;
+    unsigned long long score[11], temp;
+    score[0] = s;
+    for (int i = 0; i < 10; i++)
+    {
+        for (int j = 0; j < 10 - i; j++)
+        {
+            if (score[j] < score[j + 1])
+            {
+                temp = score[j];
+                score[j] = score[j + 1];
+                score[j + 1] = temp;
+            }
+        }
+    }
+
+    fp = fopen("history.txt", "w+"); // 打开文件，如果不存在则创建一个新文件
     time(&now);
-    fp = fopen("history.txt", "w+");                        // 打开文件，如果不存在则创建一个新文件
-    fprintf(fp, "时间：%s 分数：%llu", ctime(&now), socre); // 将分数写入文件
-    fclose(fp);                                             // 关闭文件
+    fprintf(fp, "%2d. score:%8llu time:%s", score, strtok(ctime(&now), "\n")); // 将分数写入文件，并在后面加上一个空格
+    fclose(fp);                                                                // 关闭文件
 }
 int main()
 {
