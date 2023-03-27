@@ -16,11 +16,43 @@ int COL;
 
 WINDOW *win_game;
 WINDOW *win_score;
+
 int **matrix;
 struct empty_pos *empty_sqe;
 
 unsigned long long socre = 0; // 用于记录得分
+char score_history[11][40];
 
+void get_score_history()
+{
+
+    char filename[] = "history.txt";
+    FILE *fp;
+    char line[40];
+
+    fp = fopen(filename, "r"); // 打开文件
+
+    if (fp == NULL)
+    { // 判断文件是否打开成功
+        fp = fopen(filename, 'W');
+    }
+
+    // 逐行读取文件内容
+    int line_count = 0;
+    while (fgets(line, 40, filename) != NULL)
+    {
+        // 去掉换行符
+        strtok(line, "\n");
+
+        // 存储到字符串数组中
+        strcpy(score_history[line_count], line);
+
+        // 更新行数计数器
+        line_count++;
+    }
+
+    fclose(fp); // 关闭文件
+}
 void init_matrix() // 创建窗格
 {
     // 申请行内存
@@ -52,6 +84,7 @@ void free_matrix() // 释放内存
     free(empty_sqe);
     delwin(win_game);
     delwin(win_score);
+    refresh();
 }
 void init_game_win(int width, int hight) // 创建游戏主窗口
 {
@@ -359,7 +392,6 @@ void game_2048()
 
     while (1)
     {
-
         bool flag = false;
         switch (get_user_input())
         {
