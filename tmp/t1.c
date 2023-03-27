@@ -48,7 +48,15 @@ void write_score(unsigned long long s) // 将得分记录写进本地文件
     score_mark temp;
     score_history[10].score = s;
     score_history[10].rand = 11;
-    strcpy(score_history[10].time, strtok(ctime(&now),"\n"));
+    char *time_str = strtok(ctime(&now), "\n");
+    for (int i = 0; i < strlen(time_str); i++)
+    {
+        if (time_str[i] == ' ')
+        {
+            time_str[i] = '-';
+        }
+    }
+    strcpy(score_history[10].time, time_str);
     for (int i = 0; i < 11; i++)
     {
         for (int j = 0; j < 10 - i; j++)
@@ -71,13 +79,12 @@ void write_score(unsigned long long s) // 将得分记录写进本地文件
     }
     fclose(fp);
 }
-
 int main()
 {
     get_score_history();
     //for (int i = 0; i < 10; i++)
     {
-        write_score(300);
+        write_score(200);
     }
     
     

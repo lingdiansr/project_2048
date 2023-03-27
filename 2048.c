@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <curses.h>
+#include <string.h>
 
 #include "input.h"
 #include "screen.h"
@@ -10,6 +11,13 @@ struct empty_pos
     int x;
     int y;
 };
+typedef struct
+{
+    int rand;                 // 存储排名
+    unsigned long long score; // 存储得分，8位数
+    char time[25];
+} score_mark;
+score_mark score_history[11];
 
 int ROW;
 int COL;
@@ -20,39 +28,77 @@ WINDOW *win_score;
 int **matrix;
 struct empty_pos *empty_sqe;
 
-unsigned long long socre = 0; // 用于记录得分
+unsigned long long score = 0; // 用于记录得分
 char score_history[11][40];
 
 void get_score_history()
 {
-
     char filename[] = "history.txt";
     FILE *fp;
     char line[40];
 
     fp = fopen(filename, "r"); // 打开文件
-
     if (fp == NULL)
-    { // 判断文件是否打开成功
-        fp = fopen(filename, 'W');
+    {
+        // 文件没有成功打开时，新建一个文件
+        fp = fopen(filename, "w+");
+        fclose(fp);
+        return;
     }
 
     // 逐行读取文件内容
     int line_count = 0;
-    while (fgets(line, 40, filename) != NULL)
+    while (fgets(line, 40, fp) != NULL && line_count < 10) // 修改条件，只读取前10行
     {
-        // 去掉换行符
-        strtok(line, "\n");
+        strtok(line, "\n"); // 去掉换行符
 
-        // 存储到字符串数组中
-        strcpy(score_history[line_count], line);
+        // 将读取到的内容按照格式存储到score_history数组中
+        sscanf(line, "%d. score:%llu time:%s", &score_history[line_count].rand, &score_history[line_count].score, score_history[line_count].time);
 
-        // 更新行数计数器
-        line_count++;
+        line_count++; // 更新行数计数器
     }
-
     fclose(fp); // 关闭文件
 }
+void write_score(unsigned long long s) // 将得分记录写进本地文件
+{
+    FILE *fp;
+    time_t now;
+    time(&now);
+    score_mark temp;
+    score_history[10].score = s;
+    score_history[10].rand = 11;
+    char *time_str = strtok(ctime(&now), "\n");
+    for (int i = 0; i < strlen(time_str); i++)
+    {
+        if (time_str[i] == ' ')
+        {
+            time_str[i] = '-';
+        }
+    }
+    strcpy(score_history[10].time, time_str);
+    for (int i = 0; i < 11; i++)
+    {
+        for (int j = 0; j < 10 - i; j++)
+        {
+            if (score_history[j].score < score_history[j + 1].score) // 修改比较条件
+            {
+                temp = score_history[j];
+                score_history[j] = score_history[j + 1];
+                score_history[j + 1] = temp;
+            }
+        }
+    }
+
+    fp = fopen("history.txt", "w+"); // 打开文件，如果不存在则创建一个新文件
+
+    for (int i = 0; i < 10; i++)
+    {
+        printf("%d. score:%llu time:%s\n", i + 1, score_history[i].score, strtok(score_history[i].time, "\n"));
+        fprintf(fp, "%d. score:%llu time:%-s\n", i + 1, score_history[i].score, strtok(score_history[i].time, "\n"));
+    }
+    fclose(fp);
+}
+
 void init_matrix() // 创建窗格
 {
     // 申请行内存
@@ -91,10 +137,7 @@ void init_game_win(int width, int hight) // 创建游戏主窗口
     win_game = newwin(width, hight, 8, 8);
     win_score = newwin(7, 10, 0, 0);
 }
-void get_score(int num) // 记录得分并输出
-{
-    socre += num;
-}
+
 void write_score(unsigned long long socre) // 将得分记录写进本地文件
 {
     FILE *fp;
@@ -385,7 +428,9 @@ void game_2048()
     curs_set(0);
     srand(time(NULL));
     init_game_win(100, 100);
-    socre = 0;
+    score = 0;
+    get_score_history();//各种初始化
+
     fill_rand_num();
     fill_rand_num();
     print_matrix();
@@ -419,6 +464,7 @@ void game_2048()
         }
         if (judge_end())
         {
+            write_score(score);
             free_matrix();
             break;
         }

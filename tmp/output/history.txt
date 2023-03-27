@@ -1,4 +1,4 @@
-1. score:300 time:Mon Mar 27 13:00:07 2023
+1. score:0 time:(null)
 2. score:0 time:(null)
 3. score:0 time:(null)
 4. score:0 time:(null)
