@@ -1,5 +1,4 @@
 #include <stdio.h>
-
 char score_history[11][40];
 
 void get_score_history()
@@ -8,18 +7,18 @@ void get_score_history()
     FILE *fp;
     char line[40];
 
-    fp = fopen(filename, "r+"); // 打开文件
-    if (fp==NULL)
+    fp = fopen(filename, "r"); // 打开文件
+    if (fp == NULL)
     {
         // 文件没有成功打开时，新建一个文件
-        fp = fopen(filename, "W+");
+        fp = fopen(filename, "w+");
         fclose(fp);
         return;
     }
-    
+
     // 逐行读取文件内容
     int line_count = 0;
-    while (fgets(line, 40, filename) != NULL)
+    while (fgets(line, 40, fp) != NULL)
     {
         // 去掉换行符
         strtok(line, "\n");
