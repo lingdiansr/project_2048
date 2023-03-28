@@ -75,7 +75,6 @@ void get_score_history()
     // 关闭文件
     fclose(fp);
 }
-
 // 函数名：write_score
 // 参数：无符号长整型 s，表示得分
 // 返回值：无
@@ -224,14 +223,9 @@ void print_matrix() // 输出到指定窗口上
     }
     wrefresh(win_score);
 }
-int random_num() // 随机生成2或4
-{
-    srand((unsigned int)time(NULL) + rand());
-    return rand() % 9 ? 2 : 4;
-}
 void fill_rand_num() // 填入随机2/4
 {
-    srand(time(NULL));
+    //srand(time(NULL));
     int n = get_empty();
     int pos = rand() % n;
 
@@ -239,7 +233,7 @@ void fill_rand_num() // 填入随机2/4
     {
         if (n == 1 || i + 1 == pos)
         {
-            matrix[empty_sqe[i].x][empty_sqe[i].y] = random_num();
+            matrix[empty_sqe[i].x][empty_sqe[i].y] = rand() % 9 ? 2 : 4;
         }
     }
 }
@@ -287,7 +281,6 @@ bool up_combine(int **block) // 向上合并
     }
     return flag;
 }
-
 bool down_combine(int **block) // 向下合并
 {
     bool flag = false;
