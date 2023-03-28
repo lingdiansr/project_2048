@@ -3,13 +3,21 @@
 #include <string.h>
 #include <time.h> // 添加时间头文件
 
+// 结构体定义
+typedef struct 
+{
+    int rand;                 // 排名
+    unsigned long long score; // 分数
+    time_info time;
+} score_mark;
 typedef struct
 {
-    int rand;                 // 存储2位整数
-    unsigned long long score; // 存储8位整数
-    char time[25];
-} score_mark;
-
+    char year[5]; // 年份
+    char mon[4];  // 月份
+    char day[3];  // 天数
+    char hour[3]; // 小时
+    char min[3];  // 分钟
+} time_info;           // 时间
 score_mark score_history[11];
 
 void get_score_history()
@@ -34,7 +42,7 @@ void get_score_history()
         strtok(line, "\n"); // 去掉换行符
 
         // 将读取到的内容按照格式存储到score_history数组中
-        sscanf(line, "%d. score:%llu time:%s", &score_history[line_count].rand, &score_history[line_count].score, score_history[line_count].time);
+        sscanf(line, "%d. score:%llu time:%[^-]-%[^-]-%[^-]-%[^-]-%[^-]", &score_history[line_count].rand, &score_history[line_count].score, score_history[line_count].time.year, score_history[line_count].time.mon, score_history[line_count].time.day, score_history[line_count].time.hour, score_history[line_count].time.min);
 
         line_count++; // 更新行数计数器
     }
@@ -83,10 +91,8 @@ int main()
 {
     get_score_history();
     //for (int i = 0; i < 10; i++)
-    {
-        write_score(200);
-    }
-    
-    
+    printf("%s", score_history[0].time);
+
+
     return 0;
 }

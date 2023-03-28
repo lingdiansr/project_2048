@@ -15,7 +15,7 @@ typedef struct
 {
     int rand;                 // 存储排名
     unsigned long long score; // 存储得分，8位数
-    char time[25];
+    char time[30];
 } score_mark;
 score_mark score_history[11];
 
@@ -154,7 +154,7 @@ void free_matrix() // 释放内存
 void init_game_win(int width, int hight) // 创建游戏主窗口
 {
     win_game = newwin(width, hight, 12, 8);
-    win_score = newwin(10, 50, 0, 0);
+    win_score = newwin(10, 100, 0, 0);
 }
 int get_empty() // 获取空位置数量并把位置记录在sqe中
 {
@@ -213,13 +213,14 @@ void print_matrix() // 输出到指定窗口上
     wrefresh(win_game);
 
     // 打印分数以及排行
-    // for (int i = 0; i < 10; i++)
+    wclear(win_score);
+    wprintw(win_score, "Current score:%d\n", score);
+    for (int i = 0; i < 10; i++)
     {
-        wclear(win_score);
-        wprintw(win_score,
-                "Current score:%d\n", score);
-        wprintw(win_score,
-                "Current score:%d\n", score);
+        if (score_history[i].score!=0)
+        {
+            wprintw(win_score, "%d. score:%-8llu time:%-s\n", score_history[i].rand, score_history[i].score, score_history[i].time);
+        }
     }
     wrefresh(win_score);
 }
