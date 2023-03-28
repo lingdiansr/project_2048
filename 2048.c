@@ -153,8 +153,8 @@ void free_matrix() // 释放内存
 }
 void init_game_win(int width, int hight) // 创建游戏主窗口
 {
-    win_game = newwin(width, hight, 8, 8);
-    win_score = newwin(7, 10, 0, 0);
+    win_game = newwin(width, hight, 12, 8);
+    win_score = newwin(10, 50, 0, 0);
 }
 int get_empty() // 获取空位置数量并把位置记录在sqe中
 {
@@ -180,6 +180,7 @@ int get_empty() // 获取空位置数量并把位置记录在sqe中
 }
 void print_matrix() // 输出到指定窗口上
 {
+    // 打印游戏窗格
     int i, j;
     for (i = 0; i < ROW; i++)
     {
@@ -210,6 +211,17 @@ void print_matrix() // 输出到指定窗口上
     wmove(win_game, ROW * 2, ROW * 5);
     wprintw(win_game, "+\n");
     wrefresh(win_game);
+
+    // 打印分数以及排行
+    //for (int i = 0; i < 10; i++)
+    {
+        wclear(win_score);
+        wprintw(win_score,
+                "Current score:%d\n", score);
+        wprintw(win_score,
+                "Current score:%d\n", score);
+    }
+    wrefresh(win_score);
 }
 int random_num() // 随机生成2或4
 {
@@ -244,15 +256,14 @@ bool up_combine(int **block) // 向上合并
             {
                 block[k][i] = block[j][i];
                 block[j][i] = 0;
-                score += block[k][i];
                 flag = true;
             }
             else if (block[k][i] == block[j][i]) // 相同合并
             {
+                score += block[k][i];
                 block[k][i] *= 2;
                 block[j][i] = 0;
-                score += block[k][i];
-                k++; // 合并后k位置不变
+                k++;
                 flag = true;
             }
             else // 不同移动到上一个位置
@@ -283,15 +294,14 @@ bool down_combine(int **block) // 向下合并
             {
                 block[k][i] = block[j][i];
                 block[j][i] = 0;
-                score += block[k][i];
                 flag = true;
             }
             else if (block[k][i] == block[j][i]) // 相同合并
             {
+                score += block[k][i];
                 block[k][i] *= 2;
                 block[j][i] = 0;
-                score += block[k][i];
-                k--; // 合并后k位置不变
+                k--;
                 flag = true;
             }
             else // 不同移动到上一个位置
@@ -322,15 +332,14 @@ bool left_combine(int **block)
             {
                 block[i][k] = block[i][j];
                 block[i][j] = 0;
-                score += block[i][k];
                 flag = true;
             }
             else if (block[i][k] == block[i][j]) // 相同合并
             {
+                score += block[i][k];
                 block[i][k] *= 2;
                 block[i][j] = 0;
-                score += block[i][k];
-                k++; // 合并后k位置不变
+                k++;
                 flag = true;
             }
             else // 不同移动到上一个位置
@@ -361,15 +370,14 @@ bool right_combine(int **block)
             {
                 block[i][k] = block[i][j];
                 block[i][j] = 0;
-                score += block[i][k];
                 flag = true;
             }
             else if (block[i][k] == block[i][j]) // 相同合并
             {
+                score += block[i][k];
                 block[i][k] *= 2;
                 block[i][j] = 0;
-                score += block[i][k];
-                k--; // 合并后k位置不变
+                k--;
                 flag = true;
             }
             else // 不同移动到上一个位置
