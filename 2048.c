@@ -213,7 +213,7 @@ void print_matrix() // 输出到指定窗口上
     wrefresh(win_game);
 
     // 打印分数以及排行
-    //for (int i = 0; i < 10; i++)
+    // for (int i = 0; i < 10; i++)
     {
         wclear(win_score);
         wprintw(win_score,
@@ -252,18 +252,24 @@ bool up_combine(int **block) // 向上合并
         {
             if (block[j][i] == 0) // 当前位置为空，跳过
                 continue;
-            if (block[k][i] == 0) // 下一个位置为空，移动到该位置
+            // 先进行相同合并
+            for (int l = k; l < j; l++)
+            {
+                if (block[l][i] == block[j][i])
+                {
+                    score += block[l][i];
+                    block[l][i] *= 2;
+                    block[j][i] = 0;
+                    k = l + 1;
+                    flag = true;
+                    break;
+                }
+            }
+            // 移动到空位置
+            if (block[k][i] == 0)
             {
                 block[k][i] = block[j][i];
                 block[j][i] = 0;
-                flag = true;
-            }
-            else if (block[k][i] == block[j][i]) // 相同合并
-            {
-                score += block[k][i];
-                block[k][i] *= 2;
-                block[j][i] = 0;
-                k++;
                 flag = true;
             }
             else // 不同移动到上一个位置
@@ -280,6 +286,7 @@ bool up_combine(int **block) // 向上合并
     }
     return flag;
 }
+
 bool down_combine(int **block) // 向下合并
 {
     bool flag = false;
@@ -290,18 +297,24 @@ bool down_combine(int **block) // 向下合并
         {
             if (block[j][i] == 0) // 当前位置为空，跳过
                 continue;
-            if (block[k][i] == 0) // 下一个位置为空，移动到该位置
+            // 先进行相同合并
+            for (int l = k; l > j; l--)
+            {
+                if (block[l][i] == block[j][i])
+                {
+                    score += block[l][i];
+                    block[l][i] *= 2;
+                    block[j][i] = 0;
+                    k = l - 1;
+                    flag = true;
+                    break;
+                }
+            }
+            // 移动到空位置
+            if (block[k][i] == 0)
             {
                 block[k][i] = block[j][i];
                 block[j][i] = 0;
-                flag = true;
-            }
-            else if (block[k][i] == block[j][i]) // 相同合并
-            {
-                score += block[k][i];
-                block[k][i] *= 2;
-                block[j][i] = 0;
-                k--;
                 flag = true;
             }
             else // 不同移动到上一个位置
@@ -328,18 +341,18 @@ bool left_combine(int **block)
         {
             if (block[i][j] == 0) // 当前位置为空，跳过
                 continue;
-            if (block[i][k] == 0) // 下一个位置为空，移动到该位置
-            {
-                block[i][k] = block[i][j];
-                block[i][j] = 0;
-                flag = true;
-            }
-            else if (block[i][k] == block[i][j]) // 相同合并
+            if (block[i][k] == block[i][j]) // 相同合并
             {
                 score += block[i][k];
                 block[i][k] *= 2;
                 block[i][j] = 0;
                 k++;
+                flag = true;
+            }
+            else if (block[i][k] == 0) // 下一个位置为空，移动到该位置
+            {
+                block[i][k] = block[i][j];
+                block[i][j] = 0;
                 flag = true;
             }
             else // 不同移动到上一个位置
@@ -366,18 +379,18 @@ bool right_combine(int **block)
         {
             if (block[i][j] == 0) // 当前位置为空，跳过
                 continue;
-            if (block[i][k] == 0) // 下一个位置为空，移动到该位置
-            {
-                block[i][k] = block[i][j];
-                block[i][j] = 0;
-                flag = true;
-            }
-            else if (block[i][k] == block[i][j]) // 相同合并
+            if (block[i][k] == block[i][j]) // 相同合并
             {
                 score += block[i][k];
                 block[i][k] *= 2;
                 block[i][j] = 0;
                 k--;
+                flag = true;
+            }
+            else if (block[i][k] == 0) // 下一个位置为空，移动到该位置
+            {
+                block[i][k] = block[i][j];
+                block[i][j] = 0;
                 flag = true;
             }
             else // 不同移动到上一个位置
