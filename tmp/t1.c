@@ -4,12 +4,6 @@
 #include <time.h> // 添加时间头文件
 
 // 结构体定义
-typedef struct 
-{
-    int rand;                 // 排名
-    unsigned long long score; // 分数
-    time_info time;
-} score_mark;
 typedef struct
 {
     char year[5]; // 年份
@@ -17,7 +11,14 @@ typedef struct
     char day[3];  // 天数
     char hour[3]; // 小时
     char min[3];  // 分钟
-} time_info;           // 时间
+} time_info;      // 时间
+typedef struct 
+{
+    int rand;                 // 排名
+    unsigned long long score; // 分数
+    time_info time;
+} score_mark;
+
 score_mark score_history[11];
 
 void get_score_history()

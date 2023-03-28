@@ -11,12 +11,22 @@ struct empty_pos
     int x;
     int y;
 };
+// 结构体定义
 typedef struct
 {
-    int rand;                 // 存储排名
-    unsigned long long score; // 存储得分，8位数
-    char time[30];
+    char year[5]; // 年份
+    char mon[4];  // 月份
+    char day[3];  // 天数
+    char hour[3]; // 小时
+    char min[3];  // 分钟
+} time_info;      // 时间
+typedef struct
+{
+    int rand;                 // 排名
+    unsigned long long score; // 分数
+    time_info time;
 } score_mark;
+
 score_mark score_history[11];
 
 int ROW;
@@ -63,15 +73,15 @@ void get_score_history()
     while (fgets(line, 40, fp) != NULL && line_count < 10) // 只读取前10行
     {
         // 去掉换行符
-        strtok(line, "\n");
+        //strtok(line, "\n");
 
         // 将读取到的内容按照格式存储到score_history数组中
         sscanf(line, "%d. score:%llu time:%s", &score_history[line_count].rand, &score_history[line_count].score, score_history[line_count].time);
-
+        wprintw(win_score, "%s\n", score_history[line_count].time);
         // 更新行数计数器
         line_count++;
     }
-
+    wrefresh(win_score);
     // 关闭文件
     fclose(fp);
 }
@@ -177,7 +187,7 @@ int get_empty() // 获取空位置数量并把位置记录在sqe中
     }
     return n;
 }
-void print_matrix() // 输出到指定窗口上
+void print_matrix() // 输出到窗口上
 {
     // 打印游戏窗格
     int i, j;
@@ -212,26 +222,27 @@ void print_matrix() // 输出到指定窗口上
     wrefresh(win_game);
 
     // 打印分数以及排行
-    wclear(win_score);
-    wprintw(win_score, "Current score:%d\n", score);
-    for (int i = 0; i < 10; i++)
-    {
-        if (score_history[i].score!=0)
-        {
-            wprintw(win_score, "%d. score:%-8llu time:%-s\n", score_history[i].rand, score_history[i].score, score_history[i].time);
-        }
-    }
-    wrefresh(win_score);
+//     wclear(win_score);
+//     wprintw(win_score, "Current score:%d\n", score);
+//     for (int i = 0; i < 10; i++)
+//     {
+//         if (score_history[i].score!=0)
+//         {
+//             wprintw(win_score, "%d. score:%-8llu time:%-s\n", score_history[i].rand, score_history[i].score, score_history[i].time);
+//         }
+//     }
+//     wrefresh(win_score);
 }
-void fill_rand_num() // 填入随机2/4
+void fill_rand_num()
 {
-    //srand(time(NULL));
-    int n = get_empty();
-    int pos = rand() % n;
+    int n = get_empty();  // 获取空格子数量
+    int pos = rand() % n; // 随机选取一个空格子
 
+    // 遍历所有空格子
     for (int i = 0; i < n; i++)
     {
-        if (n == 1 || i + 1 == pos)
+        // 如果只有一个空格子或者当前格子是随机选中的格子
+        if (n == 1 || i == pos)
         {
             matrix[empty_sqe[i].x][empty_sqe[i].y] = rand() % 9 ? 2 : 4;
         }
