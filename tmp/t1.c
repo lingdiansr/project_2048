@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h> // 添加时间头文件
-
-// 结构体定义
+#include <time.h> // 添加时间头文件// 结构体定义
 typedef struct
 {
     char year[5]; // 年份
@@ -11,10 +9,12 @@ typedef struct
     char day[3];  // 天数
     char hour[3]; // 小时
     char min[3];  // 分钟
+    char sec[3];  // 秒
+    char week[4]; // 星期
 } time_info;      // 时间
-typedef struct 
+typedef struct
 {
-    int rand;                 // 排名
+    int rank;                 // 排名（注意：rand是C语言中的关键字，不能用作变量名）
     unsigned long long score; // 分数
     time_info time;
 } score_mark;
@@ -43,12 +43,13 @@ void get_score_history()
         strtok(line, "\n"); // 去掉换行符
 
         // 将读取到的内容按照格式存储到score_history数组中
-        sscanf(line, "%d. score:%llu time:%[^-]-%[^-]-%[^-]-%[^-]-%[^-]", &score_history[line_count].rand, &score_history[line_count].score, score_history[line_count].time.year, score_history[line_count].time.mon, score_history[line_count].time.day, score_history[line_count].time.hour, score_history[line_count].time.min);
+        sscanf(line, "%d. score:%llu time:%[^-]-%[^-]-%[^-]-%[^-]-%[^-]-%[^-]-%s", &score_history[line_count].rank, &score_history[line_count].score, score_history[line_count].time.week, score_history[line_count].time.mon, score_history[line_count].time.day, score_history[line_count].time.hour, score_history[line_count].time.min, score_history[line_count].time.year);
 
         line_count++; // 更新行数计数器
     }
     fclose(fp); // 关闭文件
 }
+
 void write_score(unsigned long long s) // 将得分记录写进本地文件
 {
     FILE *fp;
@@ -56,7 +57,7 @@ void write_score(unsigned long long s) // 将得分记录写进本地文件
     time(&now);
     score_mark temp;
     score_history[10].score = s;
-    score_history[10].rand = 11;
+    score_history[10].rank = 11; // 新得分默认排名为11
     char *time_str = strtok(ctime(&now), "\n");
     for (int i = 0; i < strlen(time_str); i++)
     {
@@ -65,7 +66,14 @@ void write_score(unsigned long long s) // 将得分记录写进本地文件
             time_str[i] = '-';
         }
     }
-    strcpy(score_history[10].time, time_str);
+    strcpy(score_history[10].time.year, strtok(time_str, "-"));
+    strcpy(score_history[10].time.mon, strtok(NULL, "-"));
+    strcpy(score_history[10].time.day, strtok(NULL, "-"));
+    strcpy(score_history[10].time.hour, strtok(NULL, "-"));
+    strcpy(score_history[10].time.min, strtok(NULL, "-"));
+    strcpy(score_history[10].time.sec, strtok(NULL, "-"));
+    strcpy(score_history[10].time.week, strtok(NULL, "-"));
+
     for (int i = 0; i < 11; i++)
     {
         for (int j = 0; j < 10 - i; j++)
@@ -83,8 +91,8 @@ void write_score(unsigned long long s) // 将得分记录写进本地文件
 
     for (int i = 0; i < 10; i++)
     {
-        printf("%d. score:%llu time:%s\n", i + 1, score_history[i].score, strtok(score_history[i].time, "\n"));
-        fprintf(fp, "%d. score:%llu time:%-s\n", i + 1, score_history[i].score, strtok(score_history[i].time, "\n"));
+        // printf("%d. score:%llu time:%s-%s-%s-%s-%s-%s-%s\n", i + 1, score_history[i].score, score_history[i].time.week, score_history[i].time.mon, score_history[i].time.day, score_history[i].time.hour, score_history[i].time.min, score_history[i].time.sec, score_history[i].time.year);
+        fprintf(fp, "%d. score:%llu time:%s-%s-%s-%s-%s-%s-%s\n", i + 1, score_history[i].score, score_history[i].time.week, score_history[i].time.mon, score_history[i].time.day, score_history[i].time.hour, score_history[i].time.min, score_history[i].time.sec, score_history[i].time.year);
     }
     fclose(fp);
 }
@@ -92,8 +100,8 @@ int main()
 {
     get_score_history();
     //for (int i = 0; i < 10; i++)
-    printf("%s", score_history[0].time);
-
+    int i = 0;
+    printf("%d. score:%llu time:%s-%s-%s-%s-%s-%s-%s\n", i + 1, score_history[i].score, score_history[i].time.week, score_history[i].time.mon, score_history[i].time.day, score_history[i].time.hour, score_history[i].time.min, score_history[i].time.sec, score_history[i].time.year);
 
     return 0;
 }
