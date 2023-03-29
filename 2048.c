@@ -30,6 +30,10 @@ struct empty_pos *empty_sqe;
 
 unsigned long long score = 0; // 用于记录得分
 
+void playsound()
+{
+    
+}
 // 函数名称：get_score_history
 // 函数功能：从文件中读取历史得分记录并存储到数组中
 // 参数：无
