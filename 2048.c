@@ -32,7 +32,6 @@ unsigned long long score = 0; // 用于记录得分
 
 void playsound()
 {
-    
 }
 // 函数名称：get_score_history
 // 函数功能：从文件中读取历史得分记录并存储到数组中
@@ -220,7 +219,7 @@ void print_matrix() // 输出到指定窗口上
     wprintw(win_score, "Current score:%d\n", score);
     for (int i = 0; i < 10; i++)
     {
-        if (score_history[i].score!=0)
+        if (score_history[i].score != 0)
         {
             wprintw(win_score, "%d. score:%-8llu time:%-17s\n", score_history[i].rand, score_history[i].score, score_history[i].time);
         }
