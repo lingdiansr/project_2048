@@ -4,7 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "D:/mingw64/**"
+                "E:/a/mingw64/**"
             ],
             "defines": [
                 "_DEBUG",
