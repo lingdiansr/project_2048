@@ -5,6 +5,7 @@
 
 extern WINDOW *win_game;
 extern WINDOW *win_begin;
+extern WINDOW *win_close;
 extern int ROW;
 extern int COL;
 void set_size()
@@ -53,15 +54,16 @@ int begain_input()
 
 int close_input()
 {
-    keypad(close_screen(), true);
-    int ch = wgetch(close_screen());
-    keypad(close_screen(), false);
+    keypad(win_close, true);
+    int ch = wgetch(win_close);
+    keypad(win_close, false);
     if (ch == 'q' || ch == 'Q')
     {
         return QUIT;
     }
     else if (ch == 'r' || ch == 'R')
     {
+        delwin(win_close);
         game_2048();
     }
 
