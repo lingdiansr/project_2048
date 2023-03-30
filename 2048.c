@@ -2,6 +2,7 @@
 #include <time.h>
 #include <curses.h>
 #include <string.h>
+//#include<sys
 
 #include "input.h"
 #include "screen.h"
@@ -32,6 +33,15 @@ unsigned long long score = 0; // 用于记录得分
 
 void playsound()
 {
+   // WINDOW *tmp_sound_win = newwin(5, 5, 1000, 1000);
+    char id_str[3];
+    char cmd[80];
+    sprintf(id_str, "%02d", rand() % 40 + 1);
+    strcpy(cmd, "mplayer -loop 1 audio/");
+    strcat(cmd, id_str);
+    strcat(cmd, ".mp3 >/dev/null 2>&1 &");
+    system(cmd);
+    //delwin(tmp_sound_win);
 }
 // 函数名称：get_score_history
 // 函数功能：从文件中读取历史得分记录并存储到数组中
@@ -259,13 +269,14 @@ bool up_combine(int **block) // 向上合并
                 block[j][i] = 0;
                 k++;
                 flag = true;
-                break;
+                playsound();
             }
             else if (block[k][i] == 0) // 移动到空位置
             {
                 block[k][i] = block[j][i];
                 block[j][i] = 0;
                 flag = true;
+                playsound();
             }
             else // 不同移动到上一个位置
             {
@@ -275,6 +286,7 @@ bool up_combine(int **block) // 向上合并
                     block[k][i] = block[j][i];
                     block[j][i] = 0;
                     flag = true;
+                    playsound();
                 }
             }
         }
@@ -299,13 +311,14 @@ bool down_combine(int **block) // 向下合并
                 block[j][i] = 0;
                 k--;
                 flag = true;
-                break;
+                playsound();
             }
             else if (block[k][i] == 0) // 移动到空位置
             {
                 block[k][i] = block[j][i];
                 block[j][i] = 0;
                 flag = true;
+                playsound();
             }
             else // 不同移动到上一个位置
             {
@@ -315,6 +328,7 @@ bool down_combine(int **block) // 向下合并
                     block[k][i] = block[j][i];
                     block[j][i] = 0;
                     flag = true;
+                    playsound();
                 }
             }
         }
@@ -338,12 +352,14 @@ bool left_combine(int **block)
                 block[i][j] = 0;
                 k++;
                 flag = true;
+                playsound();
             }
             else if (block[i][k] == 0) // 下一个位置为空，移动到该位置
             {
                 block[i][k] = block[i][j];
                 block[i][j] = 0;
                 flag = true;
+                playsound();
             }
             else // 不同移动到上一个位置
             {
@@ -353,6 +369,7 @@ bool left_combine(int **block)
                     block[i][k] = block[i][j];
                     block[i][j] = 0;
                     flag = true;
+                    playsound();
                 }
             }
         }
@@ -376,12 +393,14 @@ bool right_combine(int **block)
                 block[i][j] = 0;
                 k--;
                 flag = true;
+                playsound();
             }
             else if (block[i][k] == 0) // 下一个位置为空，移动到该位置
             {
                 block[i][k] = block[i][j];
                 block[i][j] = 0;
                 flag = true;
+                playsound();
             }
             else // 不同移动到上一个位置
             {
@@ -391,6 +410,7 @@ bool right_combine(int **block)
                     block[i][k] = block[i][j];
                     block[i][j] = 0;
                     flag = true;
+                    playsound();
                 }
             }
         }

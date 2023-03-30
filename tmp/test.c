@@ -1,357 +1,540 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
-#include <stdbool.h>
+/*
+ ============================================================================
+ Name        : 2048.c
+ Author      : Maurits van der Schee
+ Description : Console version of the game "2048" for GNU/Linux
+ ============================================================================
+ */
+
+#define _XOPEN_SOURCE 500 // for: usleep
+#include <stdio.h>        // defines: printf, puts, getchar
+#include <stdlib.h>       // defines: EXIT_SUCCESS
+#include <string.h>       // defines: strcmp
+#include <unistd.h>       // defines: STDIN_FILENO, usleep
+#include <termios.h>      // defines: termios, TCSANOW, ICANON, ECHO
+#include <stdbool.h>      // defines: true, false
+#include <stdint.h>       // defines: uint8_t, uint32_t
+#include <time.h>         // defines: time
+#include <signal.h>       // defines: signal, SIGINT
 
 #define SIZE 4
-#define ROW SIZE
-#define COL SIZE
-#define LEFT 1
-#define RIGHT 2
-#define UP 3
-#define DOWN 4
-#define QUIT -1
 
-unsigned long long socre = 0;
-int matrix[ROW][COL] = {
-    0, 0, 0, 0,
-    0, 0, 0, 0,
-    0, 0, 0, 0,
-    0, 0, 0, 0};
-struct empty_pos
+// this function receives 2 pointers (indicated by *) so it can set their values
+void getColors(uint8_t value, uint8_t scheme, uint8_t *foreground, uint8_t *background)
 {
-    int x;
-    int y;
-} empty_sqe[ROW * COL]; // 记录空位置坐标
-int get_user_input()
-{
-    int ch;
-    ch=getchar();
-    if (ch == 'q' || ch == 'Q')
-    {
-        return QUIT;
-    }
-    else if (ch == 'a' || ch == 'A' )
-    {
-        return LEFT;
-    }
-    else if (ch == 'w' || ch == 'W' )
-    {
-        return UP;
-    }
-    else if (ch == 's' || ch == 'S' )
-    {
-        return DOWN;
-    }
-    else if (ch == 'd' || ch == 'D' )
-    {
-        return RIGHT;
-    }
+    uint8_t original[] = {8, 255, 1, 255, 2, 255, 3, 255, 4, 255, 5, 255, 6, 255, 7, 255, 9, 0, 10, 0, 11, 0, 12, 0, 13, 0, 14, 0, 255, 0, 255, 0};
+    uint8_t blackwhite[] = {232, 255, 234, 255, 236, 255, 238, 255, 240, 255, 242, 255, 244, 255, 246, 0, 248, 0, 249, 0, 250, 0, 251, 0, 252, 0, 253, 0, 254, 0, 255, 0};
+    uint8_t bluered[] = {235, 255, 63, 255, 57, 255, 93, 255, 129, 255, 165, 255, 201, 255, 200, 255, 199, 255, 198, 255, 197, 255, 196, 255, 196, 255, 196, 255, 196, 255, 196, 255};
+    uint8_t *schemes[] = {original, blackwhite, bluered};
+    // modify the 'pointed to' variables (using a * on the left hand of the assignment)
+    *foreground = *(schemes[scheme] + (1 + value * 2) % sizeof(original));
+    *background = *(schemes[scheme] + (0 + value * 2) % sizeof(original));
+    // alternatively we could have returned a struct with two variables
 }
-void get_score(int num)
+
+uint8_t getDigitCount(uint32_t number)
 {
-    socre += num;
-}
-void empty_init() // 位置初始化
-{
-    for (int i = 0; i < ROW * COL; i++)
+    uint8_t count = 0;
+    do
     {
-        empty_sqe[i].x = 0;
-        empty_sqe[i].y = 0;
-    }
+        number /= 10;
+        count += 1;
+    } while (number);
+    return count;
 }
-void bor() // 随机化matrix
+
+void drawBoard(uint8_t board[SIZE][SIZE], uint8_t scheme, uint32_t score)
 {
-    for (int i = 0; i < 4; i++)
+    uint8_t x, y, fg, bg;
+    printf("\033[H"); // move cursor to 0,0
+    printf("2048.c %17d pts\n\n", score);
+    for (y = 0; y < SIZE; y++)
     {
-        for (int j = 0; j < 4; j++)
+        for (x = 0; x < SIZE; x++)
         {
-            srand((unsigned int)time(NULL) + rand());
-            matrix[i][j] = rand() % 9 ? 2 : 4;
+            // send the addresses of the foreground and background variables,
+            // so that they can be modified by the getColors function
+            getColors(board[x][y], scheme, &fg, &bg);
+            printf("\033[38;5;%d;48;5;%dm", fg, bg); // set color
+            printf("       ");
+            printf("\033[m"); // reset all modes
         }
-    }
-}
-int get_empty() // 获取空位置数量并把位置记录在sqe中
-{
-    empty_init();
-    int n = 0;
-    for (int i = 0; i < ROW; i++)
-    {
-        for (int j = 0; j < COL; j++)
+        printf("\n");
+        for (x = 0; x < SIZE; x++)
         {
-            if (matrix[i][j] == 0)
+            getColors(board[x][y], scheme, &fg, &bg);
+            printf("\033[38;5;%d;48;5;%dm", fg, bg); // set color
+            if (board[x][y] != 0)
             {
-                empty_sqe[n].x = i;
-                empty_sqe[n].y = j;
-                n++;
+                uint32_t number = 1 << board[x][y];
+                uint8_t t = 7 - getDigitCount(number);
+                printf("%*s%u%*s", t - t / 2, "", number, t / 2, "");
+            }
+            else
+            {
+                printf("   ·   ");
+            }
+            printf("\033[m"); // reset all modes
+        }
+        printf("\n");
+        for (x = 0; x < SIZE; x++)
+        {
+            getColors(board[x][y], scheme, &fg, &bg);
+            printf("\033[38;5;%d;48;5;%dm", fg, bg); // set color
+            printf("       ");
+            printf("\033[m"); // reset all modes
+        }
+        printf("\n");
+    }
+    printf("\n");
+    printf("        ←,↑,→,↓ or q        \n");
+    printf("\033[A"); // one line up
+}
+
+uint8_t findTarget(uint8_t array[SIZE], uint8_t x, uint8_t stop)
+{
+    uint8_t t;
+    // if the position is already on the first, don't evaluate
+    if (x == 0)
+    {
+        return x;
+    }
+    for (t = x - 1;; t--)
+    {
+        if (array[t] != 0)
+        {
+            if (array[t] != array[x])
+            {
+                // merge is not possible, take next position
+                return t + 1;
+            }
+            return t;
+        }
+        else
+        {
+            // we should not slide further, return this one
+            if (t == stop)
+            {
+                return t;
             }
         }
     }
-    return n;
+    // we did not find a target
+    return x;
 }
-void print_matrix() // 输出到屏幕上
+
+bool slideArray(uint8_t array[SIZE], uint32_t *score)
 {
-    // draw_grid();
-    for (int i = 0; i < 4; i++)
+    bool success = false;
+    uint8_t x, t, stop = 0;
+
+    for (x = 0; x < SIZE; x++)
     {
-        for (int j = 0; j < 4; j++)
+        if (array[x] != 0)
         {
-            printf("%4d", matrix[i][j]);
-        }
-        putchar(10);
-    }
-}
-int random_num() // 随机生成2或4
-{
-    srand((unsigned int)time(NULL) + rand());
-    return rand() % (rand() % 10) ? 2 : 4;
-}
-void fill_rand_num() // 填入随机2/4
-{
-    srand(time(NULL));
-    int n = get_empty();
-    int pos = rand() % n;
-    for (int i = 0; i < n; i++)
-    {
-        if (i + 1 == pos)
-        {
-            matrix[empty_sqe[i].x][empty_sqe[i].y] = random_num();
-        }
-    }
-}
-bool up_combine() // 向上合并
-{
-    int i, j, k;
-    bool flag = false;
-    for (i = 0; i < COL; i++)
-    {
-        for (j = 1; j <= ROW - 1; j++) //*
-        {
-            for (k = j - 1; k > 0; k--) //*
+            t = findTarget(array, x, stop);
+            // if target is not original position, then move or merge
+            if (t != x)
             {
-                // 寻找合并位置
-                // 1.上方经过或不经过空位有相同数字，合并到该位置
-                // 2.上方有不同数字时，合并到上一个位置
-                // 3.上方全为空，移动到该位置
-                // if中为1. 2. 这两种情况需要提前跳出循环得到位置
-                if (matrix[k][i] == matrix[j][i] || (matrix[k][i] != 0 && matrix[k][i] != matrix[j][i]))
+                // if target is zero, this is a move
+                if (array[t] == 0)
                 {
-                    break;
+                    array[t] = array[x];
                 }
-            }
-            if (matrix[k][i] == matrix[j][i]) // 相同合并
-            {
-                matrix[k][i] *= 2;
-                get_score(matrix[j][i]);
-                matrix[j][i] = 0;
-                flag = true;
-            }
-            else if (matrix[k][i] != 0 && matrix[k][i] != matrix[j][i]) // 不同移动到上一个位置
-            {
-                if (k < j - 1)                       //*
-                {                                    // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
-                    matrix[k + 1][i] = matrix[j][i]; //*
-                    get_score(matrix[j][i]);
-                    matrix[j][i] = 0;
-                    flag = true;
-                }
-            }
-            else // 移动到空位置
-            {
-                matrix[k][i] = matrix[j][i];
-                matrix[j][i] = 0;
-                flag = true;
-            }
-        }
-    }
-    return flag;
-}
-bool down_combine() // 向下合并
-{
-    int i, j, k;
-    bool flag = false;
-    for (i = 0; i < COL; i++)
-    {
-        for (j = ROW - 2; j >= 0; j--)
-        {
-            for (k = j + 1; k < ROW - 1; k++)
-            {
-                // 寻找合并位置
-                // 1.下方经过或不经过空位有相同数字，合并到该位置
-                // 2.下方有不同数字时，合并到上一个位置
-                // 3.下方全为空，移动到该位置
-                // if中为1. 2. 这两种情况需要提前跳出循环得到位置
-                if (matrix[k][i] == matrix[j][i] || (matrix[k][i] != 0 && matrix[k][i] != matrix[j][i]))
+                else if (array[t] == array[x])
                 {
-                    break;
+                    // merge (increase power of two)
+                    array[t]++;
+                    // increase score
+                    *score += (uint32_t)1 << array[t];
+                    // set stop to avoid double merge
+                    stop = t + 1;
                 }
-            }
-            if (matrix[k][i] == matrix[j][i]) // 相同合并
-            {
-                matrix[k][i] *= 2;
-                matrix[j][i] = 0;
-                flag = true;
-            }
-            else if (matrix[k][i] != 0 && matrix[k][i] != matrix[j][i]) // 不同移动到上一个位置
-            {
-                if (k > j + 1)
-                { // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
-                    matrix[k - 1][i] = matrix[j][i];
-                    matrix[j][i] = 0;
-                    flag = true;
-                }
-            }
-            else // 移动到空位置
-            {
-                matrix[k][i] = matrix[j][i];
-                matrix[j][i] = 0;
-                flag = true;
+                array[x] = 0;
+                success = true;
             }
         }
     }
-    return flag;
+    return success;
 }
-bool left_combine()
+
+void rotateBoard(uint8_t board[SIZE][SIZE])
 {
-    int i, j, k;
-    bool flag = false;
-    for (i = 0; i < ROW; i++)
+    uint8_t i, j, n = SIZE;
+    uint8_t tmp;
+    for (i = 0; i < n / 2; i++)
     {
-        for (j = 1; j <= COL - 1; j++)
+        for (j = i; j < n - i - 1; j++)
         {
-            for (k = j - 1; k > 0; k--)
-            {
-                if (matrix[i][k] == matrix[i][j] || (matrix[i][k] != 0 && matrix[i][k] != matrix[i][j]))
-                {
-                    break;
-                }
-            }
-            if (matrix[i][k] == matrix[i][j]) // 相同合并
-            {
-                matrix[i][k] *= 2;
-                matrix[i][j] = 0;
-                flag = true;
-            }
-            else if (matrix[i][k] != 0 && matrix[i][k] != matrix[i][j]) // 不同移动到上一个位置
-            {
-                if (k < j - 1)                       //*
-                {                                    // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
-                    matrix[i][k + 1] = matrix[i][j]; //*
-                    matrix[i][j] = 0;
-                    flag = true;
-                }
-            }
-            else // 移动到空位置
-            {
-                matrix[i][k] = matrix[i][j];
-                matrix[i][j] = 0;
-                flag = true;
-            }
-            print_matrix();
+            tmp = board[i][j];
+            board[i][j] = board[j][n - i - 1];
+            board[j][n - i - 1] = board[n - i - 1][n - j - 1];
+            board[n - i - 1][n - j - 1] = board[n - j - 1][i];
+            board[n - j - 1][i] = tmp;
         }
     }
-    return flag;
 }
-bool right_combine()
+
+bool moveUp(uint8_t board[SIZE][SIZE], uint32_t *score)
 {
-    int i, j, k;
-    bool flag = false;
-    for (i = 0; i < ROW; i++)
+    bool success = false;
+    uint8_t x;
+    for (x = 0; x < SIZE; x++)
     {
-        for (j = COL - 2; j >= 0; j--)
-        {
-            for (k = j + 1; k < COL - 1; k++)
-            {
-                if (matrix[i][k] == matrix[i][j] || (matrix[i][k] != 0 && matrix[i][k] != matrix[i][j]))
-                {
-                    break;
-                }
-            }
-            if (matrix[i][k] == matrix[i][j]) // 相同合并
-            {
-                matrix[i][k] *= 2;
-                matrix[i][j] = 0;
-                flag = true;
-            }
-            else if (matrix[i][k] != 0 && matrix[i][k] != matrix[i][j]) // 不同移动到上一个位置
-            {
-                if (k > j + 1)                       //*
-                {                                    // 相邻时不需要变化，此条件不可写入外层elif，否则会误判进else情况
-                    matrix[i][k - 1] = matrix[i][j]; //*
-                    matrix[i][j] = 0;
-                    flag = true;
-                }
-            }
-            else // 移动到空位置
-            {
-                matrix[i][k] = matrix[i][j];
-                matrix[i][j] = 0;
-                flag = true;
-            }
-        }
+        success |= slideArray(board[x], score);
     }
-    return flag;
+    return success;
 }
-bool judge_end()
-{ // false表示游戏还能继续，true表示游戏结束
-    int m_backup[ROW][COL] = {0};
-    for (int i = 0; i < ROW; i++)
+
+bool moveLeft(uint8_t board[SIZE][SIZE], uint32_t *score)
+{
+    bool success;
+    rotateBoard(board);
+    success = moveUp(board, score);
+    rotateBoard(board);
+    rotateBoard(board);
+    rotateBoard(board);
+    return success;
+}
+
+bool moveDown(uint8_t board[SIZE][SIZE], uint32_t *score)
+{
+    bool success;
+    rotateBoard(board);
+    rotateBoard(board);
+    success = moveUp(board, score);
+    rotateBoard(board);
+    rotateBoard(board);
+    return success;
+}
+
+bool moveRight(uint8_t board[SIZE][SIZE], uint32_t *score)
+{
+    bool success;
+    rotateBoard(board);
+    rotateBoard(board);
+    rotateBoard(board);
+    success = moveUp(board, score);
+    rotateBoard(board);
+    return success;
+}
+
+bool findPairDown(uint8_t board[SIZE][SIZE])
+{
+    bool success = false;
+    uint8_t x, y;
+    for (x = 0; x < SIZE; x++)
     {
-        for (int j = 0; j < COL; j++)
+        for (y = 0; y < SIZE - 1; y++)
         {
-            m_backup[i][j] = matrix[i][j];
+            if (board[x][y] == board[x][y + 1])
+                return true;
         }
     }
-    if (up_combine() || down_combine() || left_combine() || right_combine())
+    return success;
+}
+
+uint8_t countEmpty(uint8_t board[SIZE][SIZE])
+{
+    uint8_t x, y;
+    uint8_t count = 0;
+    for (x = 0; x < SIZE; x++)
     {
+        for (y = 0; y < SIZE; y++)
+        {
+            if (board[x][y] == 0)
+            {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
+bool gameEnded(uint8_t board[SIZE][SIZE])
+{
+    bool ended = true;
+    if (countEmpty(board) > 0)
         return false;
-    }
-    else
+    if (findPairDown(board))
+        return false;
+    rotateBoard(board);
+    if (findPairDown(board))
+        ended = false;
+    rotateBoard(board);
+    rotateBoard(board);
+    rotateBoard(board);
+    return ended;
+}
+
+void addRandom(uint8_t board[SIZE][SIZE])
+{
+    static bool initialized = false;
+    uint8_t x, y;
+    uint8_t r, len = 0;
+    uint8_t n, list[SIZE * SIZE][2];
+
+    if (!initialized)
     {
-        return true;
+        srand(time(NULL));
+        initialized = true;
+    }
+
+    for (x = 0; x < SIZE; x++)
+    {
+        for (y = 0; y < SIZE; y++)
+        {
+            if (board[x][y] == 0)
+            {
+                list[len][0] = x;
+                list[len][1] = y;
+                len++;
+            }
+        }
+    }
+
+    if (len > 0)
+    {
+        r = rand() % len;
+        x = list[r][0];
+        y = list[r][1];
+        n = (rand() % 10) / 9 + 1;
+        board[x][y] = n;
     }
 }
-void game_2048()
+
+void initBoard(uint8_t board[SIZE][SIZE])
 {
-    srand(time(NULL));
-    // init_game_win(, 4, 26);
-    //init_game_win(4, 24);
-    socre = 0;
-    fill_rand_num();
-    fill_rand_num();
-    print_matrix();
-    while (1)
+    uint8_t x, y;
+    for (x = 0; x < SIZE; x++)
     {
-        //curs_set(0);
-        bool flag = false;
-        switch (get_user_input())
+        for (y = 0; y < SIZE; y++)
         {
-        case LEFT:
-            flag = left_combine();
-            break;
-        case RIGHT:
-            flag = right_combine();
-            break;
-        case UP:
-            flag = up_combine();
-            break;
-        case DOWN:
-            flag = down_combine();
-            break;
-        case QUIT:
-            return;
-        default:
-            break;
+            board[x][y] = 0;
         }
-        if (flag)
-        {
-            fill_rand_num();
-            print_matrix();
-        }
-        if (judge_end())
-        {
-            break;
-        }
-        // wrefresh(win_game);
     }
+    addRandom(board);
+    addRandom(board);
+}
+
+void setBufferedInput(bool enable)
+{
+    static bool enabled = true;
+    static struct termios old;
+    struct termios new;
+
+    if (enable && !enabled)
+    {
+        // restore the former settings
+        tcsetattr(STDIN_FILENO, TCSANOW, &old);
+        // set the new state
+        enabled = true;
+    }
+    else if (!enable && enabled)
+    {
+        // get the terminal settings for standard input
+        tcgetattr(STDIN_FILENO, &new);
+        // we want to keep the old setting to restore them at the end
+        old = new;
+        // disable canonical mode (buffered i/o) and local echo
+        new.c_lflag &= (~ICANON & ~ECHO);
+        // set the new settings immediately
+        tcsetattr(STDIN_FILENO, TCSANOW, &new);
+        // set the new state
+        enabled = false;
+    }
+}
+
+int test()
+{
+    uint8_t array[SIZE];
+    // these are exponents with base 2 (1=2 2=4 3=8)
+    // data holds per line: 4x IN, 4x OUT, 1x POINTS
+    uint8_t data[] = {
+        0, 0, 0, 1, 1, 0, 0, 0, 0,
+        0, 0, 1, 1, 2, 0, 0, 0, 4,
+        0, 1, 0, 1, 2, 0, 0, 0, 4,
+        1, 0, 0, 1, 2, 0, 0, 0, 4,
+        1, 0, 1, 0, 2, 0, 0, 0, 4,
+        1, 1, 1, 0, 2, 1, 0, 0, 4,
+        1, 0, 1, 1, 2, 1, 0, 0, 4,
+        1, 1, 0, 1, 2, 1, 0, 0, 4,
+        1, 1, 1, 1, 2, 2, 0, 0, 8,
+        2, 2, 1, 1, 3, 2, 0, 0, 12,
+        1, 1, 2, 2, 2, 3, 0, 0, 12,
+        3, 0, 1, 1, 3, 2, 0, 0, 4,
+        2, 0, 1, 1, 2, 2, 0, 0, 4};
+    uint8_t *in, *out, *points;
+    uint8_t t, tests;
+    uint8_t i;
+    bool success = true;
+    uint32_t score;
+
+    tests = (sizeof(data) / sizeof(data[0])) / (2 * SIZE + 1);
+    for (t = 0; t < tests; t++)
+    {
+        in = data + t * (2 * SIZE + 1);
+        out = in + SIZE;
+        points = in + 2 * SIZE;
+        for (i = 0; i < SIZE; i++)
+        {
+            array[i] = in[i];
+        }
+        score = 0;
+        slideArray(array, &score);
+        for (i = 0; i < SIZE; i++)
+        {
+            if (array[i] != out[i])
+            {
+                success = false;
+            }
+        }
+        if (score != *points)
+        {
+            success = false;
+        }
+        if (success == false)
+        {
+            for (i = 0; i < SIZE; i++)
+            {
+                printf("%d ", in[i]);
+            }
+            printf("=> ");
+            for (i = 0; i < SIZE; i++)
+            {
+                printf("%d ", array[i]);
+            }
+            printf("(%d points) expected ", score);
+            for (i = 0; i < SIZE; i++)
+            {
+                printf("%d ", in[i]);
+            }
+            printf("=> ");
+            for (i = 0; i < SIZE; i++)
+            {
+                printf("%d ", out[i]);
+            }
+            printf("(%d points)\n", *points);
+            break;
+        }
+    }
+    if (success)
+    {
+        printf("All %u tests executed successfully\n", tests);
+    }
+    return !success;
+}
+
+void signal_callback_handler(int signum)
+{
+    printf("         TERMINATED         \n");
+    setBufferedInput(true);
+    // make cursor visible, reset all modes
+    printf("\033[?25h\033[m");
+    exit(signum);
+}
+
+int main(int argc, char *argv[])
+{
+    uint8_t board[SIZE][SIZE];
+    uint8_t scheme = 0;
+    uint32_t score = 0;
+    char c;
+    bool success;
+
+    if (argc == 2 && strcmp(argv[1], "test") == 0)
+    {
+        return test();
+    }
+    if (argc == 2 && strcmp(argv[1], "blackwhite") == 0)
+    {
+        scheme = 1;
+    }
+    if (argc == 2 && strcmp(argv[1], "bluered") == 0)
+    {
+        scheme = 2;
+    }
+
+    // make cursor invisible, erase entire screen
+    printf("\033[?25l\033[2J");
+
+    // register signal handler for when ctrl-c is pressed
+    signal(SIGINT, signal_callback_handler);
+
+    initBoard(board);
+    setBufferedInput(false);
+    drawBoard(board, scheme, score);
+    while (true)
+    {
+        c = getchar();
+        if (c == -1)
+        {
+            puts("\nError! Cannot read keyboard input!");
+            break;
+        }
+        switch (c)
+        {
+        case 97:  // 'a' key
+        case 104: // 'h' key
+        case 68:  // left arrow
+            success = moveLeft(board, &score);
+            break;
+        case 100: // 'd' key
+        case 108: // 'l' key
+        case 67:  // right arrow
+            success = moveRight(board, &score);
+            break;
+        case 119: // 'w' key
+        case 107: // 'k' key
+        case 65:  // up arrow
+            success = moveUp(board, &score);
+            break;
+        case 115: // 's' key
+        case 106: // 'j' key
+        case 66:  // down arrow
+            success = moveDown(board, &score);
+            break;
+        default:
+            success = false;
+        }
+        if (success)
+        {
+            drawBoard(board, scheme, score);
+            usleep(150 * 1000); // 150 ms
+            addRandom(board);
+            drawBoard(board, scheme, score);
+            if (gameEnded(board))
+            {
+                printf("         GAME OVER          \n");
+                break;
+            }
+        }
+        if (c == 'q')
+        {
+            printf("        QUIT? (y/n)         \n");
+            c = getchar();
+            if (c == 'y')
+            {
+                break;
+            }
+            drawBoard(board, scheme, score);
+        }
+        if (c == 'r')
+        {
+            printf("       RESTART? (y/n)       \n");
+            c = getchar();
+            if (c == 'y')
+            {
+                initBoard(board);
+                score = 0;
+            }
+            drawBoard(board, scheme, score);
+        }
+    }
+    setBufferedInput(true);
+
+    // make cursor visible, reset all modes
+    printf("\033[?25h\033[m");
+
+    return EXIT_SUCCESS;
 }
