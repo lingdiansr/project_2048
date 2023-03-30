@@ -1,6 +1,6 @@
 #include "input.h"
 #include "screen.h"
-
+#include "2048.h"
 #include <curses.h>
 
 extern WINDOW *win_game;
@@ -49,6 +49,22 @@ int begain_input()
     {
         return NOR_MODE;
     }
+}
+
+int close_input()
+{
+    keypad(close_screen(), true);
+    int ch = wgetch(close_screen());
+    keypad(close_screen(), false);
+    if (ch == 'q' || ch == 'Q')
+    {
+        return QUIT;
+    }
+    else if (ch == 'r' || ch == 'R')
+    {
+        game_2048();
+    }
+
 }
 int get_user_input()
 {

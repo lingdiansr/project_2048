@@ -13,6 +13,7 @@
 #define LIT_MODE 102
 #define EAS_MODE 103
 
+int close_input();
 int get_user_input();
 int begain_input();
 void set_size();

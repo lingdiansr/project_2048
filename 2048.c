@@ -238,6 +238,7 @@ void print_matrix() // 输出到指定窗口上
 }
 void fill_rand_num()
 {
+
     int n = get_empty();  // 获取空格子数量
     int pos = rand() % n; // 随机选取一个空格子
 

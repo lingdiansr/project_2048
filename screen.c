@@ -13,36 +13,32 @@ void open_screen()
     cbreak();             // ctrl+c结束游戏进程
     noecho();             // 不用回显
     keypad(stdscr, TRUE); // 使用功能键：上下左右
-
 }
 void close_screen()
 {
     int x0 = 8, y0 = 8;
     int width = 50;
-    char str_score[25]={"Your score is :"};
+    char str_score[25] = {"Your score is :"};
     char char_score[9];
-    sprintf()
+    sprintf(char_score," %-8llu", score);
+    strcat(str_score, char_score);
     win_close = newwin(100, width, y0, x0);
     curs_set(0);
-    int over_x=(width-strlen("Game Over !!!")) / 2;
-    int score_x=(width-strlen("Your score is :")) / 2;
+    int over_x = (width - strlen("Game Over !!!")) / 2;
+    int score_x = (width - strlen(str_score)) / 2;
 
     int restart_x = (width - strlen("1. restart: press the key R twice")) / 2;
-    int native_chart_x = (width - strlen("2. open the score chart: press the key S twice")) / 2;
-    int quit_x = (width - strlen("4.press Q to quit")) / 2;
+    int quit_x = (width - strlen("2.press Q to quit")) / 2;
 
     mvwprintw(win_close, 0, over_x, "Game Over !!!");
-    mvwprintw(win_close, 4, restart_x, "1. restart: press the key R twice");
-    mvwprintw(win_close, 8, native_chart_x, "2. open the score chart: press the key S twice");
-    mvwprintw(win_close, 12, quit_x, "4.press Q to quit");
+    mvwprintw(win_close, 2, score_x, str_score);
+    mvwprintw(win_close, 6, restart_x, "1. restart: press the key R twice");
+    mvwprintw(win_close, 14, quit_x, "2.press Q to quit");
 
     wrefresh(win_close);
+    close_input();
 
-    while (1)
-        ;
-    {
-        /* code */
-    }
+   
     delwin(win_close);
     refresh();
 
