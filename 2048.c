@@ -485,6 +485,7 @@ void game_2048()
         if (judge_end())
         {
             write_score(score);
+            
             free_matrix();
             break;
         }
