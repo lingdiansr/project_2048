@@ -1,7 +1,5 @@
 /.vscode
 
-.vscode/c_cpp_properties.json
-.vscode/c_cpp_properties.json
 wav_backup/3-1.mp3
 wav_backup/3-1.wav
 wav_backup/3-2.mp3
@@ -83,3 +81,4 @@ wav_backup/6-6.wav
 wav_backup/6-7.mp3
 wav_backup/6-7.wav
 wav_backup/wav_to mp3.bat
+.vscode/c_cpp_properties.json
