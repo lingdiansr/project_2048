@@ -252,21 +252,16 @@ bool up_combine(int **block) // 向上合并
         {
             if (block[j][i] == 0) // 当前位置为空，跳过
                 continue;
-            // 先进行相同合并
-            for (int l = k; l < j; l++)
+            if (block[k][i] == block[j][i]) // 先进行相同合并
             {
-                if (block[l][i] == block[j][i])
-                {
-                    score += block[l][i];
-                    block[l][i] *= 2;
-                    block[j][i] = 0;
-                    k = l + 1;
-                    flag = true;
-                    break;
-                }
+                score += block[k][i];
+                block[k][i] *= 2;
+                block[j][i] = 0;
+                k++;
+                flag = true;
+                break;
             }
-            // 移动到空位置
-            if (block[k][i] == 0)
+            else if (block[k][i] == 0) // 移动到空位置
             {
                 block[k][i] = block[j][i];
                 block[j][i] = 0;
@@ -296,21 +291,17 @@ bool down_combine(int **block) // 向下合并
         {
             if (block[j][i] == 0) // 当前位置为空，跳过
                 continue;
-            // 先进行相同合并
-            for (int l = k; l > j; l--)
+
+            if (block[k][i] == block[j][i]) // 先进行相同合并
             {
-                if (block[l][i] == block[j][i])
-                {
-                    score += block[l][i];
-                    block[l][i] *= 2;
-                    block[j][i] = 0;
-                    k = l - 1;
-                    flag = true;
-                    break;
-                }
+                score += block[k][i];
+                block[k][i] *= 2;
+                block[j][i] = 0;
+                k--;
+                flag = true;
+                break;
             }
-            // 移动到空位置
-            if (block[k][i] == 0)
+            else if (block[k][i] == 0) // 移动到空位置
             {
                 block[k][i] = block[j][i];
                 block[j][i] = 0;
