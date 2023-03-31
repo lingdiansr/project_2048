@@ -7,6 +7,9 @@
 #include "input.h"
 #include "screen.h"
 
+#define HORZ_LINE "\u2500\u2500\u2500\u2500\u2500"
+#define VERT_LINE "\u2502"
+
 struct empty_pos
 {
     int x;
@@ -29,35 +32,23 @@ WINDOW *win_score;
 int **matrix;
 struct empty_pos *empty_sqe;
 
-unsigned long long score = 0; // 用于记录得分
-unsigned long long sound_count = 0;
+unsigned long long score = 0;       // 用于记录得分
+unsigned long long sound_count = 0; // 用于计数移动次数以播放音效
 void playsound()
 {
-    // WINDOW *tmp_sound_win = newwin(5, 5, 1000, 1000);
-    /*
-    03030506+1+1060505060503030506+1+10605050605050505030506060505030203050302010102010302010302030506+105020305020301-6-5-6010203010201-6-5
-    #include <stdio.h>
 
-int main() {
-    char* arr[] = {"03", "03", "05", "06", "+1", "+10", "60", "50", "50", "60", "50", "30", "30", "50", "6+1", "+10", "60", "50", "50", "60", "50", "50", "50", "50", "30", "60", "50", "60", "50", "30", "20",
-
-    */
     char *molihua[] = {"03", "03", "05", "06", "+1", "+1", "06", "05", "05", "06", "05", "03",
                        "03", "05", "06", "+1", "+1", "06", "05", "05", "05", "06", "05", "05",
                        "05", "03", "05", "06", "05", "05", "05", "03", "02", "03", "05", "02",
                        "03", "01", "02", "01", "03", "02", "01", "03", "02", "01", "03", "05",
                        "06", "+1", "05", "02", "03", "05", "02", "03", "01", "-6", "-5", "-6",
                        "01", "02", "03", "01", "02", "01", "-6", "-5"};
-
-    char id_str[3];
     char cmd[80];
-    sprintf(id_str, "%02d", rand() % 40 + 1);
     strcpy(cmd, "mplayer audio/");
     strcat(cmd, molihua[sound_count % 68]);
     sound_count++;
     strcat(cmd, ".mp3 >/dev/null 2>&1 &");
     system(cmd);
-    // delwin(tmp_sound_win);
 }
 // 函数名称：get_score_history
 // 函数功能：从文件中读取历史得分记录并存储到数组中
@@ -206,6 +197,55 @@ int get_empty() // 获取空位置数量并把位置记录在sqe中
     }
     return n;
 }
+
+/*
+// Define box-drawing characters
+
+// Print top row of grid
+wprintw(win_game, "\u250c");
+for (j = 0; j < COL; j++)
+{
+    wprintw(win_game, "%s%s%s", HORZ_LINE, HORZ_LINE, j == COL - 1 ? "\u2510\n" : "\u252c");
+}
+
+// Print intermediate rows of grid
+for (i = 0; i < ROW; i++)
+{
+    for (int k = 0; k < 2; k++)
+    {
+        wprintw(win_game, VERT_LINE);
+        for (j = 0; j < COL; j++)
+        {
+            wmove(win_game, i * 2 + k + 1, j * 5 + 1);
+            if (matrix[i][j] == 0)
+            {
+                wprintw(win_game, "     ");
+            }
+            else
+            {
+                wprintw(win_game, "%4d ", matrix[i][j]);
+            }
+            wprintw(win_game, VERT_LINE);
+        }
+        wprintw(win_game, "\n");
+        if (k == 0)
+        {
+            wprintw(win_game, "\u251c");
+            for (j = 0; j < COL; j++)
+            {
+                wprintw(win_game, "%s%s%s", HORZ_LINE, HORZ_LINE, j == COL - 1 ? "\u2524\n" : "\u253c");
+            }
+        }
+    }
+}
+
+// Print bottom row of grid
+wprintw(win_game, "\u2514");
+for (j = 0; j < COL; j++)
+{
+    wprintw(win_game, "%s%s%s", HORZ_LINE, HORZ_LINE, j == COL - 1 ? "\u2518\n" : "\u2534");
+}
+*/
 void print_matrix() // 输出到指定窗口上
 {
     // 打印游戏窗格
@@ -254,7 +294,6 @@ void print_matrix() // 输出到指定窗口上
 }
 void fill_rand_num()
 {
-
     int n = get_empty();  // 获取空格子数量
     int pos = rand() % n; // 随机选取一个空格子
 
