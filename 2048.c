@@ -37,7 +37,7 @@ void playsound()
     char id_str[3];
     char cmd[80];
     sprintf(id_str, "%02d", rand() % 40 + 1);
-    strcpy(cmd, "mplayer -loop 1 audio/");
+    strcpy(cmd, "mplayer audio/");
     strcat(cmd, id_str);
     strcat(cmd, ".mp3 >/dev/null 2>&1 &");
     system(cmd);
