@@ -11,6 +11,7 @@ extern WINDOW *win_close;
 
 extern int ROW;
 extern int COL;
+int cond;
 void set_size()
 {
     switch (begain_input())
