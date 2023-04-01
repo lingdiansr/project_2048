@@ -98,14 +98,14 @@ void get_score_history()
 // 功能：将得分记录写进本地文件
 void write_score(unsigned long long s)
 {
-    FILE *fp;                                   // 文件指针
-    time_t now;                                 // 时间变量
-    time(&now);                                 // 获取当前时间
-    score_mark temp;                            // 分数记录结构体
-    score_history[10].score = s;                // 将得分存储到分数记录数组中
-    score_history[10].rand = 11;                // 将随机数存储到分数记录数组中
-    char *time_str = ctime(&now); // 获取时间字符串
-    for (int i = 0; i < strlen(time_str); i++)  // 将时间字符串中的空格替换为“-”
+    FILE *fp;                                  // 文件指针
+    time_t now;                                // 时间变量
+    time(&now);                                // 获取当前时间
+    score_mark temp;                           // 分数记录结构体
+    score_history[10].score = s;               // 将得分存储到分数记录数组中
+    score_history[10].rand = 11;               // 将随机数存储到分数记录数组中
+    char *time_str = strtok(ctime(&now),"\n");              // 获取时间字符串
+    for (int i = 0; i < strlen(time_str); i++) // 将时间字符串中的空格替换为“-”
     {
         if (time_str[i] == ' ')
         {
@@ -130,7 +130,7 @@ void write_score(unsigned long long s)
 
     for (int i = 0; i < 10; i++) // 将排名前十的分数记录写入文件中
     {
-        fprintf(fp, "%d. score:%llu time:%-s", i + 1, score_history[i].score, score_history[i].time);
+        fprintf(fp, "%d. score:%llu time:%-s\n", i + 1, score_history[i].score, score_history[i].time);
     }
     fclose(fp); // 关闭文件
 }

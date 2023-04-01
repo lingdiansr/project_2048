@@ -1,1 +1,10 @@
-1. score:0 time:2. score:0 time:3. score:0 time:4. score:0 time:5. score:0 time:6. score:0 time:7. score:0 time:8. score:0 time:9. score:0 time:10. score:0 time:
+1. score:55168 time:Sat-Apr--1-20:55:06-2023
+2. score:7040 time:Sat-Apr--1-20:57:17-2023
+3. score:176 time:Sat-Apr--1-20:56:43-2023
+4. score:56 time:Sat-Apr--1-20:56:01-2023
+5. score:52 time:Sat-Apr--1-20:56:55-2023
+6. score:0 time:
+7. score:0 time:
+8. score:0 time:
+9. score:0 time:
+10. score:0 time:
