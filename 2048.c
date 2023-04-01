@@ -15,7 +15,7 @@ typedef struct
 {
     int rand;                 // 存储排名
     unsigned long long score; // 存储得分，8位数
-    char time[20];
+    char time[25];
 } score_mark;
 score_mark score_history[11];
 
@@ -60,7 +60,8 @@ void get_score_history()
     FILE *fp;
 
     // 定义字符串变量
-    char line[42];
+
+    char line[50];
 
     // 打开文件
     fp = fopen(filename, "r");
@@ -76,13 +77,13 @@ void get_score_history()
 
     // 逐行读取文件内容
     int line_count = 0;
-    while (fgets(line, 42, fp) != NULL && line_count < 10) // 只读取前10行
+    while (fgets(line, 50, fp) != NULL && line_count < 10) // 只读取前10行
     {
         // 去掉换行符
         strtok(line, "\n");
 
         // 将读取到的内容按照格式存储到score_history数组中
-        sscanf(line, "%d. score:%llu time:%s", &score_history[line_count].rand, &score_history[line_count].score, score_history[line_count].time);
+        sscanf(line, "%d. score:%llu time:%24s", &score_history[line_count].rand, &score_history[line_count].score, score_history[line_count].time);
 
         // 更新行数计数器
         line_count++;
@@ -231,6 +232,7 @@ void print_matrix() // 输出到指定窗口上
 
     // 打印分数以及排行
     wclear(win_score);
+    wrefresh(win_score);
     wprintw(win_score, "Current score:%d\n", score);
     for (int i = 0; i < 10; i++)
     {
