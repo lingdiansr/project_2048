@@ -1,17 +1,1 @@
-<<<<<<< HEAD
-1. score:18304 time:Sat-Apr--1-17:42:38-2023
-2. score:1904 time:Tue-Mar-28-22:52:51-
-3. score:1880 time:Tue-Mar-28-22:42:42-
-4. score:1680 time:Tue-Mar-28-22:40:40-
-=======
-1. score:760 time:Sat-Apr--1-15:47:15-2023
-2. score:484 time:Sat-Apr--1-15:44:02-2023
-3. score:0 time:(null)
-4. score:0 time:(null)
->>>>>>> 4fc03a109aee37aeb287c9186fd07b0d65d2ec1b
-5. score:0 time:(null)
-6. score:0 time:(null)
-7. score:0 time:(null)
-8. score:0 time:(null)
-9. score:0 time:(null)
-10. score:0 time:(null)
+1. score:0 time:2. score:0 time:3. score:0 time:4. score:0 time:5. score:0 time:6. score:0 time:7. score:0 time:8. score:0 time:9. score:0 time:10. score:0 time:

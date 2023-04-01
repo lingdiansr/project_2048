@@ -104,26 +104,3 @@ void pattern_screen() // 创建一个模式界面窗口
     delwin(win_pattern);
     refresh();
 }
-void pattern_screen() // 创建一个模式界面窗口
-{
-    int x0 = 8, y0 = 8;
-    int width = 50;
-
-    win_pattern = newwin(100, width, y0, x0);
-    curs_set(0);
-
-    // 计算居中位置并输出文字
-
-    int normal_x = (width - strlen("1.Normal pattern: press the key C")) / 2;
-    int cheat_x = (width - strlen("2.Cheat pattern: press the key D")) / 2;
-
-    mvwprintw(win_pattern, 4, normal_x, "1.Normal pattern: press the key C");
-    mvwprintw(win_pattern, 8, cheat_x, "2.Cheat pattern: press the key D");
-    pattern_input();
-
-    wrefresh(win_pattern);
-    
-    
-    delwin(win_pattern);
-    refresh();
-}

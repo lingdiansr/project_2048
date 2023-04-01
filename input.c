@@ -103,14 +103,13 @@ void pattern_input()
     keypad(win_pattern, false);
     if (cha == 'c' || cha == 'C')
     {
-        cond=5;
+        cond = 5;
     }
     else if (cha == 'd' || cha == 'D')
     {
-        cond= 6;
+        cond = 6;
     }
 }
-
 
 int ra()
 {
@@ -119,8 +118,10 @@ int ra()
     {
     case 5:
         x = rand() % 9 ? 2 : 4;
+        break;
     case 6:
         x = (rand() % 2 + 1) * 64;
-        return x;
+        break;
     }
+    return x;
 }
