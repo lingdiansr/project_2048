@@ -1,7 +1,10 @@
 #include <curses.h>
 #include <string.h>
+
 #include "input.h"
 #include "2048.h"
+#include "main.h"
+
 extern unsigned long long score;
 // 绘制窗格
 WINDOW *win_begin;
@@ -16,32 +19,44 @@ void open_screen()
 }
 void close_screen()
 {
+    write_score(score); // 结束时写入得分
     int x0 = 8, y0 = 8;
     int width = 50;
-    char str_score[25] = {"Your score is :"};
-    char char_score[10];
-    sprintf(char_score, " %-8llu", score);
-    strcat(str_score, char_score);
+
     win_close = newwin(100, width, y0, x0);
     curs_set(0);
+
+    char str_score[25] = {"Your score is :"};
+    char char_score[10];
+    sprintf(char_score,  " %-llu", score);
+    strcat(str_score, char_score); // 将得分写入字符串，用于在结束窗口展示
+
+    // 以下整形用于计算字符串居中时的输出位置
     int over_x = (width - strlen("Game Over !!!")) / 2;
     int score_x = (width - strlen(str_score)) / 2;
-
     int restart_x = (width - strlen("1. restart: press the key R")) / 2;
     int quit_x = (width - strlen("2.press Q to quit")) / 2;
 
+    // 输出
     mvwprintw(win_close, 0, over_x, "Game Over !!!");
     mvwprintw(win_close, 4, score_x, str_score);
-    mvwprintw(win_close, 6, restart_x, "1. restart: press the key R");
-    mvwprintw(win_close, 10, quit_x, "2.press Q to quit");
+    mvwprintw(win_close, 8, restart_x, "1. restart: press the key R");
+    mvwprintw(win_close, 12, quit_x, "2.press Q to quit");
 
     wrefresh(win_close);
-    close_input();
 
-    // endwin(); // 关闭窗口
+    switch (close_input())
+    {
+    case RESTART:
+        main(); // 重新开始游戏
+        break;
+    default:
+        break;
+    }
+    endwin();
 }
 
-void begin_screen() // 创建一个主界面窗口
+void begin_screen() // 创建一个启动界面窗口
 {
     int x0 = 8, y0 = 8;
     int width = 50;
@@ -63,8 +78,30 @@ void begin_screen() // 创建一个主界面窗口
     mvwprintw(win_begin, 16, quit_x, "4.press Q to quit");
 
     wrefresh(win_begin);
-    set_size();
-    delwin(win_begin);
+    set_size(); // 获取输入，设定游戏网格大小
+    endwin();
+}
+void pattern_screen() // 创建一个模式界面窗口
+{
+    int x0 = 8, y0 = 8;
+    int width = 50;
+
+    win_pattern = newwin(100, width, y0, x0);
+    curs_set(0);
+
+    // 计算居中位置并输出文字
+
+    int normal_x = (width - strlen("1.Normal pattern: press the key C")) / 2;
+    int cheat_x = (width - strlen("2.Cheat pattern: press the key D")) / 2;
+
+    mvwprintw(win_pattern, 4, normal_x, "1.Normal pattern: press the key C");
+    mvwprintw(win_pattern, 8, cheat_x, "2.Cheat pattern: press the key D");
+    pattern_input();
+
+    wrefresh(win_pattern);
+    
+    
+    delwin(win_pattern);
     refresh();
 }
 void pattern_screen() // 创建一个模式界面窗口

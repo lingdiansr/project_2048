@@ -2,7 +2,6 @@
 #include <time.h>
 #include <curses.h>
 #include <string.h>
-// #include<sys
 
 #include "input.h"
 #include "screen.h"
@@ -16,7 +15,7 @@ typedef struct
 {
     int rand;                 // 存储排名
     unsigned long long score; // 存储得分，8位数
-    char time[20];
+    char time[25];
 } score_mark;
 score_mark score_history[11];
 
@@ -29,19 +28,23 @@ WINDOW *win_score;
 int **matrix;
 struct empty_pos *empty_sqe;
 
-unsigned long long score = 0; // 用于记录得分
-
+unsigned long long score = 0;       // 用于记录得分
+unsigned long long sound_count = 0; // 用于计数移动次数以播放音效
 void playsound()
 {
-    // WINDOW *tmp_sound_win = newwin(5, 5, 1000, 1000);
-    char id_str[3];
+
+    char *molihua[] = {"03", "03", "05", "06", "+1", "+1", "06", "05", "05", "06", "05", "03",
+                       "03", "05", "06", "+1", "+1", "06", "05", "05", "05", "06", "05", "05",
+                       "05", "03", "05", "06", "05", "05", "05", "03", "02", "03", "05", "02",
+                       "03", "01", "02", "01", "03", "02", "01", "03", "02", "01", "03", "05",
+                       "06", "+1", "05", "02", "03", "05", "02", "03", "01", "-6", "-5", "-6",
+                       "01", "02", "03", "01", "02", "01", "-6", "-5"};
     char cmd[80];
-    sprintf(id_str, "%02d", rand() % 40 + 1);
-    strcpy(cmd, "mplayer -loop 1 audio/");
-    strcat(cmd, id_str);
+    strcpy(cmd, "mplayer audio/");
+    strcat(cmd, molihua[sound_count % 68]);
+    sound_count++;
     strcat(cmd, ".mp3 >/dev/null 2>&1 &");
     system(cmd);
-    // delwin(tmp_sound_win);
 }
 // 函数名称：get_score_history
 // 函数功能：从文件中读取历史得分记录并存储到数组中
@@ -57,7 +60,8 @@ void get_score_history()
     FILE *fp;
 
     // 定义字符串变量
-    char line[40];
+
+    char line[50];
 
     // 打开文件
     fp = fopen(filename, "r");
@@ -73,13 +77,13 @@ void get_score_history()
 
     // 逐行读取文件内容
     int line_count = 0;
-    while (fgets(line, 40, fp) != NULL && line_count < 10) // 只读取前10行
+    while (fgets(line, 50, fp) != NULL && line_count < 10) // 只读取前10行
     {
         // 去掉换行符
         strtok(line, "\n");
 
         // 将读取到的内容按照格式存储到score_history数组中
-        sscanf(line, "%d. score:%llu time:%s", &score_history[line_count].rand, &score_history[line_count].score, score_history[line_count].time);
+        sscanf(line, "%d. score:%llu time:%24s", &score_history[line_count].rand, &score_history[line_count].score, score_history[line_count].time);
 
         // 更新行数计数器
         line_count++;
@@ -159,6 +163,8 @@ void free_matrix() // 释放内存
     }
     free(matrix);
     free(empty_sqe);
+    werase(win_game);
+    werase(win_score);
     delwin(win_game);
     delwin(win_score);
     refresh();
@@ -226,6 +232,7 @@ void print_matrix() // 输出到指定窗口上
 
     // 打印分数以及排行
     wclear(win_score);
+    wrefresh(win_score);
     wprintw(win_score, "Current score:%d\n", score);
     for (int i = 0; i < 10; i++)
     {
@@ -238,7 +245,6 @@ void print_matrix() // 输出到指定窗口上
 }
 void fill_rand_num()
 {
-
     int n = get_empty();  // 获取空格子数量
     int pos = rand() % n; // 随机选取一个空格子
 
@@ -475,6 +481,8 @@ void game_2048()
             flag = down_combine(matrix);
             break;
         case QUIT:
+            print_matrix();
+            free_matrix();
             return;
         default:
             break;
@@ -487,7 +495,6 @@ void game_2048()
         }
         if (judge_end())
         {
-            write_score(score);
             free_matrix();
             break;
         }

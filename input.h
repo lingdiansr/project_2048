@@ -4,13 +4,12 @@
 
 
 
-
-
 #define LEFT 1
 #define RIGHT 2
 #define UP 3
 #define DOWN 4
 #define QUIT -1
+#define RESTART 5
 
 
 #define NOR_MODE 101

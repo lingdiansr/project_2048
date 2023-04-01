@@ -1,15 +1,16 @@
+#include <curses.h>
+
 #include "input.h"
 #include "screen.h"
 #include "2048.h"
-#include <curses.h>
 
 extern WINDOW *win_game;
 extern WINDOW *win_begin;
 extern WINDOW *win_pattern;
 extern WINDOW *win_close;
+
 extern int ROW;
 extern int COL;
-int cond;
 void set_size()
 {
     switch (begain_input())
@@ -65,12 +66,7 @@ int close_input()
     }
     else if (ch == 'r' || ch == 'R')
     {
-
-        wclear(win_close);
-        delwin(win_close);
-
-        refresh();
-        game_2048();
+        return RESTART;
     }
 }
 int get_user_input()

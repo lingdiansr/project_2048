@@ -1,0 +1,17 @@
+# linux终端小游戏2048
+## 源文件
+- main.c
+- screen.c
+- input.c
+- 2048.c
+## 头文件
+- main.h
+- screen.h
+- input.h
+- 2048.h
+## 编译文件
+- Makefile
+## 音效文件夹
+- audio
+## 得分记录文件
+- history.txt
