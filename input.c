@@ -1,13 +1,16 @@
+#include <curses.h>
+
 #include "input.h"
 #include "screen.h"
 #include "2048.h"
-#include <curses.h>
 
 extern WINDOW *win_game;
 extern WINDOW *win_begin;
 extern WINDOW *win_close;
+
 extern int ROW;
 extern int COL;
+
 void set_size()
 {
     switch (begain_input())

@@ -1,8 +1,10 @@
 #include <curses.h>
 #include <string.h>
+
 #include "input.h"
 #include "2048.h"
 #include "main.h"
+
 extern unsigned long long score;
 // 绘制窗格
 WINDOW *win_begin;
@@ -17,21 +19,25 @@ void open_screen()
 }
 void close_screen()
 {
-    write_score(score);
+    write_score(score); // 结束时写入得分
     int x0 = 8, y0 = 8;
     int width = 50;
+
+    win_close = newwin(100, width, y0, x0);
+    curs_set(0);
+
     char str_score[25] = {"Your score is :"};
     char char_score[10];
     sprintf(char_score, " %-llu", score);
-    strcat(str_score, char_score);
-    win_close = newwin(100, width, y0, x0);
-    curs_set(0);
+    strcat(str_score, char_score); // 将得分写入字符串，用于在结束窗口展示
+
+    // 以下整形用于计算字符串居中时的输出位置
     int over_x = (width - strlen("Game Over !!!")) / 2;
     int score_x = (width - strlen(str_score)) / 2;
-
     int restart_x = (width - strlen("1. restart: press the key R")) / 2;
     int quit_x = (width - strlen("2.press Q to quit")) / 2;
 
+    // 输出
     mvwprintw(win_close, 0, over_x, "Game Over !!!");
     mvwprintw(win_close, 4, score_x, str_score);
     mvwprintw(win_close, 8, restart_x, "1. restart: press the key R");
@@ -42,7 +48,7 @@ void close_screen()
     switch (close_input())
     {
     case RESTART:
-        main();
+        main(); // 重新开始游戏
         break;
     default:
         break;
@@ -50,7 +56,7 @@ void close_screen()
     endwin();
 }
 
-void begin_screen() // 创建一个主界面窗口
+void begin_screen() // 创建一个启动界面窗口
 {
     int x0 = 8, y0 = 8;
     int width = 50;
@@ -72,7 +78,6 @@ void begin_screen() // 创建一个主界面窗口
     mvwprintw(win_begin, 16, quit_x, "4.press Q to quit");
 
     wrefresh(win_begin);
-    set_size();
-    delwin(win_begin);
-    refresh();
+    set_size(); // 获取输入，设定游戏网格大小
+    endwin();
 }

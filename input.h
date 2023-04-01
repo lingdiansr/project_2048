@@ -1,8 +1,6 @@
 #ifndef _INPUT_H_
 #define _INPUT_H_
 
-
-
 #define LEFT 1
 #define RIGHT 2
 #define UP 3

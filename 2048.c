@@ -2,11 +2,9 @@
 #include <time.h>
 #include <curses.h>
 #include <string.h>
-// #include<sys
 
 #include "input.h"
 #include "screen.h"
-
 
 struct empty_pos
 {
@@ -197,55 +195,6 @@ int get_empty() // 获取空位置数量并把位置记录在sqe中
     }
     return n;
 }
-
-/*
-// Define box-drawing characters
-
-// Print top row of grid
-wprintw(win_game, "\u250c");
-for (j = 0; j < COL; j++)
-{
-    wprintw(win_game, "%s%s%s", HORZ_LINE, HORZ_LINE, j == COL - 1 ? "\u2510\n" : "\u252c");
-}
-
-// Print intermediate rows of grid
-for (i = 0; i < ROW; i++)
-{
-    for (int k = 0; k < 2; k++)
-    {
-        wprintw(win_game, VERT_LINE);
-        for (j = 0; j < COL; j++)
-        {
-            wmove(win_game, i * 2 + k + 1, j * 5 + 1);
-            if (matrix[i][j] == 0)
-            {
-                wprintw(win_game, "     ");
-            }
-            else
-            {
-                wprintw(win_game, "%4d ", matrix[i][j]);
-            }
-            wprintw(win_game, VERT_LINE);
-        }
-        wprintw(win_game, "\n");
-        if (k == 0)
-        {
-            wprintw(win_game, "\u251c");
-            for (j = 0; j < COL; j++)
-            {
-                wprintw(win_game, "%s%s%s", HORZ_LINE, HORZ_LINE, j == COL - 1 ? "\u2524\n" : "\u253c");
-            }
-        }
-    }
-}
-
-// Print bottom row of grid
-wprintw(win_game, "\u2514");
-for (j = 0; j < COL; j++)
-{
-    wprintw(win_game, "%s%s%s", HORZ_LINE, HORZ_LINE, j == COL - 1 ? "\u2518\n" : "\u2534");
-}
-*/
 void print_matrix() // 输出到指定窗口上
 {
     // 打印游戏窗格
@@ -530,6 +479,7 @@ void game_2048()
             flag = down_combine(matrix);
             break;
         case QUIT:
+            print_matrix();
             free_matrix();
             return;
         default:
