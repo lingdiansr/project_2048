@@ -20,7 +20,7 @@ void close_screen()
     int width = 50;
     char str_score[25] = {"Your score is :"};
     char char_score[10];
-    sprintf(char_score," %-8llu", score);
+    sprintf(char_score," %-llu", score);
     strcat(str_score, char_score);
     win_close = newwin(100, width, y0, x0);
     curs_set(0);
@@ -36,9 +36,17 @@ void close_screen()
     mvwprintw(win_close, 10, quit_x, "2.press Q to quit");
 
     wrefresh(win_close);
-    close_input();
-   
 
+    switch (close_input())
+    {
+    case RESTART:
+        endwin(); //关闭窗口
+        refresh();
+        game_2048();
+        break;
+    default:
+        break;
+   }
     //endwin(); // 关闭窗口
 }
 

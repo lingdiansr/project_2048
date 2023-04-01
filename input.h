@@ -8,6 +8,7 @@
 #define UP 3
 #define DOWN 4
 #define QUIT -1
+#define RESTART 5
 
 #define NOR_MODE 101
 #define LIT_MODE 102
