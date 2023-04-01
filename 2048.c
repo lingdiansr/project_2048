@@ -248,7 +248,7 @@ void fill_rand_num()
         // 如果只有一个空格子或者当前格子是随机选中的格子
         if (n == 1 || i == pos)
         {
-            matrix[empty_sqe[i].x][empty_sqe[i].y] = rand() % 9 ? 2 : 4;
+            matrix[empty_sqe[i].x][empty_sqe[i].y] = ra();
         }
     }
 }

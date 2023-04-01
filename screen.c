@@ -6,7 +6,7 @@ extern unsigned long long score;
 // 绘制窗格
 WINDOW *win_begin;
 WINDOW *win_close;
-
+WINDOW *win_pattern;
 void open_screen()
 {
     initscr();            // 初始化字符窗口
@@ -20,7 +20,7 @@ void close_screen()
     int width = 50;
     char str_score[25] = {"Your score is :"};
     char char_score[10];
-    sprintf(char_score," %-8llu", score);
+    sprintf(char_score, " %-8llu", score);
     strcat(str_score, char_score);
     win_close = newwin(100, width, y0, x0);
     curs_set(0);
@@ -37,9 +37,8 @@ void close_screen()
 
     wrefresh(win_close);
     close_input();
-   
 
-    //endwin(); // 关闭窗口
+    // endwin(); // 关闭窗口
 }
 
 void begin_screen() // 创建一个主界面窗口
@@ -66,5 +65,28 @@ void begin_screen() // 创建一个主界面窗口
     wrefresh(win_begin);
     set_size();
     delwin(win_begin);
+    refresh();
+}
+void pattern_screen() // 创建一个模式界面窗口
+{
+    int x0 = 8, y0 = 8;
+    int width = 50;
+
+    win_pattern = newwin(100, width, y0, x0);
+    curs_set(0);
+
+    // 计算居中位置并输出文字
+
+    int normal_x = (width - strlen("1.Normal pattern: press the key C")) / 2;
+    int cheat_x = (width - strlen("2.Cheat pattern: press the key D")) / 2;
+
+    mvwprintw(win_pattern, 4, normal_x, "1.Normal pattern: press the key C");
+    mvwprintw(win_pattern, 8, cheat_x, "2.Cheat pattern: press the key D");
+    pattern_input();
+
+    wrefresh(win_pattern);
+    
+    
+    delwin(win_pattern);
     refresh();
 }

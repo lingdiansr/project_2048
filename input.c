@@ -5,9 +5,11 @@
 
 extern WINDOW *win_game;
 extern WINDOW *win_begin;
+extern WINDOW *win_pattern;
 extern WINDOW *win_close;
 extern int ROW;
 extern int COL;
+int cond;
 void set_size()
 {
     switch (begain_input())
@@ -95,5 +97,33 @@ int get_user_input()
     else if (ch == 'd' || ch == 'D' || ch == KEY_RIGHT)
     {
         return RIGHT;
+    }
+}
+void pattern_input()
+{
+    keypad(win_pattern, true);
+    int cha = wgetch(win_pattern);
+    keypad(win_pattern, false);
+    if (cha == 'c' || cha == 'C')
+    {
+        cond=5;
+    }
+    else if (cha == 'd' || cha == 'D')
+    {
+        cond= 6;
+    }
+}
+
+
+int ra()
+{
+    int x;
+    switch (cond)
+    {
+    case 5:
+        x = rand() % 9 ? 2 : 4;
+    case 6:
+        x = (rand() % 2 + 1) * 64;
+        return x;
     }
 }

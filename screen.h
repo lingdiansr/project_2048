@@ -5,6 +5,7 @@
 初始化字符窗口
 */
 void open_screen();
+void pattern_screen();
 void begin_screen();
 
 
