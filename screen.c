@@ -2,6 +2,7 @@
 #include <string.h>
 #include "input.h"
 #include "2048.h"
+#include "main.h"
 extern unsigned long long score;
 // 绘制窗格
 WINDOW *win_begin;
@@ -32,22 +33,20 @@ void close_screen()
 
     mvwprintw(win_close, 0, over_x, "Game Over !!!");
     mvwprintw(win_close, 4, score_x, str_score);
-    mvwprintw(win_close, 6, restart_x, "1. restart: press the key R");
-    mvwprintw(win_close, 10, quit_x, "2.press Q to quit");
+    mvwprintw(win_close, 8, restart_x, "1. restart: press the key R");
+    mvwprintw(win_close, 12, quit_x, "2.press Q to quit");
 
     wrefresh(win_close);
 
     switch (close_input())
     {
     case RESTART:
-        endwin(); //关闭窗口
-        refresh();
-        game_2048();
+        main();
         break;
     default:
         break;
    }
-    //endwin(); // 关闭窗口
+   endwin();
 }
 
 void begin_screen() // 创建一个主界面窗口
