@@ -84,7 +84,7 @@ void get_score_history()
         strtok(line, "\n");
 
         // 将读取到的内容按照格式存储到score_history数组中
-        sscanf(line, "%d. score:%llu time:%[^ ]", &score_history[line_count].rand, &score_history[line_count].score, score_history[line_count].time);
+        sscanf(line, "%d. score:%llu time:%s", &score_history[line_count].rand, &score_history[line_count].score, score_history[line_count].time);
 
         // 更新行数计数器
         line_count++;
