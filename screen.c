@@ -17,6 +17,7 @@ void open_screen()
 }
 void close_screen()
 {
+    write_score(score);
     int x0 = 8, y0 = 8;
     int width = 50;
     char str_score[25] = {"Your score is :"};

@@ -7,8 +7,6 @@
 #include "input.h"
 #include "screen.h"
 
-#define HORZ_LINE "\u2500\u2500\u2500\u2500\u2500"
-#define VERT_LINE "\u2502"
 
 struct empty_pos
 {
@@ -64,7 +62,7 @@ void get_score_history()
     FILE *fp;
 
     // 定义字符串变量
-    char line[40];
+    char line[42];
 
     // 打开文件
     fp = fopen(filename, "r");
@@ -80,13 +78,13 @@ void get_score_history()
 
     // 逐行读取文件内容
     int line_count = 0;
-    while (fgets(line, 40, fp) != NULL && line_count < 10) // 只读取前10行
+    while (fgets(line, 42, fp) != NULL && line_count < 10) // 只读取前10行
     {
         // 去掉换行符
         strtok(line, "\n");
 
         // 将读取到的内容按照格式存储到score_history数组中
-        sscanf(line, "%d. score:%llu time:%s", &score_history[line_count].rand, &score_history[line_count].score, score_history[line_count].time);
+        sscanf(line, "%d. score:%llu time:%[^ ]", &score_history[line_count].rand, &score_history[line_count].score, score_history[line_count].time);
 
         // 更新行数计数器
         line_count++;
@@ -166,6 +164,8 @@ void free_matrix() // 释放内存
     }
     free(matrix);
     free(empty_sqe);
+    werase(win_game);
+    werase(win_score);
     delwin(win_game);
     delwin(win_score);
     refresh();
@@ -530,6 +530,7 @@ void game_2048()
             flag = down_combine(matrix);
             break;
         case QUIT:
+            free_matrix();
             return;
         default:
             break;
@@ -542,7 +543,6 @@ void game_2048()
         }
         if (judge_end())
         {
-            write_score(score);
             free_matrix();
             break;
         }

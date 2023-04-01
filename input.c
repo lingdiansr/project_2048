@@ -64,11 +64,6 @@ int close_input()
     else if (ch == 'r' || ch == 'R')
     {
         return RESTART;
-        // wclear(win_close);
-        // delwin(win_close);
-
-        // refresh();
-        // game_2048();
     }
 }
 int get_user_input()

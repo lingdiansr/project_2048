@@ -1,6 +1,6 @@
-1. score:1904 time:Tue-Mar-28-22:52:51-2023
-2. score:1880 time:Tue-Mar-28-22:42:42-
-3. score:1680 time:Tue-Mar-28-22:40:40-
+1. score:80 time:Sat-Apr--1-11:51:36-2023
+2. score:70 time:Sat-Apr--1-11:23:11-2023
+3. score:18 time:Sat-Apr--1-11:52:56-2023
 4. score:0 time:(null)
 5. score:0 time:(null)
 6. score:0 time:(null)
