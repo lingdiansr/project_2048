@@ -21,7 +21,7 @@ void close_screen()
     int width = 50;
     char str_score[25] = {"Your score is :"};
     char char_score[10];
-    sprintf(char_score," %-llu", score);
+    sprintf(char_score, " %-llu", score);
     strcat(str_score, char_score);
     win_close = newwin(100, width, y0, x0);
     curs_set(0);
@@ -45,8 +45,8 @@ void close_screen()
         break;
     default:
         break;
-   }
-   endwin();
+    }
+    endwin();
 }
 
 void begin_screen() // 创建一个主界面窗口
