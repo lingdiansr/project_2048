@@ -205,29 +205,23 @@ void print_matrix() // 输出到指定窗口上
         for (j = 0; j < COL; j++)
         {
             wmove(win_game, i * 2, j * 5);
-            wprintw(win_game, "+-----+");
+            wprintw(win_game, "+----+");
             wmove(win_game, i * 2 + 1, j * 5);
             if (matrix[i][j] == 0)
             {
-                wprintw(win_game, "|     |");
+                wprintw(win_game, "|    |");
             }
             else
             {
-                wprintw(win_game, "|%4d |", matrix[i][j]);
+                wprintw(win_game, "|%4d|", matrix[i][j]);
             }
         }
-        wmove(win_game, i * 2, COL * 5);
-        wprintw(win_game, "+\n");
-        wmove(win_game, i * 2 + 1, COL * 5);
-        wprintw(win_game, "|\n");
     }
     for (j = 0; j < COL; j++)
     {
         wmove(win_game, ROW * 2, j * 5);
-        wprintw(win_game, "+-----+");
+        wprintw(win_game, "+----+");
     }
-    wmove(win_game, ROW * 2, ROW * 5);
-    wprintw(win_game, "+\n");
     wrefresh(win_game);
 
     // 打印分数以及排行
