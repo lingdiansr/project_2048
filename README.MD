@@ -1,6 +1,6 @@
 # linux终端小游戏2048
 - mplayer安装命令
-`sudo apt-get install mplayer`
+`sudo apt-get install mplayer`  
 ## 源文件
 - main.c
 - screen.c
