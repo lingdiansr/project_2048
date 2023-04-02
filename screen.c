@@ -20,7 +20,7 @@ void open_screen()
 void close_screen()
 {
     write_score(score); // 结束时写入得分
-    int x0 = 8, y0 = 8;
+    int x0 = 8, y0 = 12;
     int width = 50;
 
     win_close = newwin(100, width, y0, x0);
@@ -58,7 +58,7 @@ void close_screen()
 
 void begin_screen() // 创建一个启动界面窗口
 {
-    int x0 = 8, y0 = 8;
+    int x0 = 8, y0 = 12;
     int width = 50;
 
     win_begin = newwin(100, width, y0, x0);
@@ -83,7 +83,7 @@ void begin_screen() // 创建一个启动界面窗口
 }
 void pattern_screen() // 创建一个模式界面窗口
 {
-    int x0 = 8, y0 = 8;
+    int x0 = 8, y0 = 12;
     int width = 50;
 
     win_pattern = newwin(100, width, y0, x0);

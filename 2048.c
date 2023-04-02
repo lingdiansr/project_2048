@@ -98,14 +98,14 @@ void get_score_history()
 // 功能：将得分记录写进本地文件
 void write_score(unsigned long long s)
 {
-    FILE *fp;                                  // 文件指针
-    time_t now;                                // 时间变量
-    time(&now);                                // 获取当前时间
-    score_mark temp;                           // 分数记录结构体
-    score_history[10].score = s;               // 将得分存储到分数记录数组中
-    score_history[10].rand = 11;               // 将随机数存储到分数记录数组中
-    char *time_str = strtok(ctime(&now),"\n");              // 获取时间字符串
-    for (int i = 0; i < strlen(time_str); i++) // 将时间字符串中的空格替换为“-”
+    FILE *fp;                                   // 文件指针
+    time_t now;                                 // 时间变量
+    time(&now);                                 // 获取当前时间
+    score_mark temp;                            // 分数记录结构体
+    score_history[10].score = s;                // 将得分存储到分数记录数组中
+    score_history[10].rand = 11;                // 将随机数存储到分数记录数组中
+    char *time_str = strtok(ctime(&now), "\n"); // 获取时间字符串
+    for (int i = 0; i < strlen(time_str); i++)  // 将时间字符串中的空格替换为“-”
     {
         if (time_str[i] == ' ')
         {
@@ -172,7 +172,7 @@ void free_matrix() // 释放内存
 void init_game_win(int width, int hight) // 创建游戏主窗口
 {
     win_game = newwin(width, hight, 12, 8);
-    win_score = newwin(10, 100, 0, 0);
+    win_score = newwin(11, 100, 0, 0);
 }
 int get_empty() // 获取空位置数量并把位置记录在sqe中
 {
